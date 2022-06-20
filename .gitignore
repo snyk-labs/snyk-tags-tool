@@ -1,3 +1,5 @@
 .dccache
 .env
 snyk_tags/__pycache__
+snyk_tags.egg-info
+build

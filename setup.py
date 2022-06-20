@@ -10,8 +10,12 @@ setup(
     license='MIT',
     packages=['snyk_tags'],
     install_requires=['httpx',
-                      'python-dotenv',                     
-                      ],
+                    'python-dotenv',  
+                    'typer',
+                    'colorama',
+                    'shellingham',
+                    'pytest'                   
+                    ],
 
     classifiers=[
         'Development Status :: 1 - Planning',

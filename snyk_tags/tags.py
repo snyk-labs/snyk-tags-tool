@@ -22,7 +22,11 @@ All of your Snyk Code projects will be shown via this filter.
 import logging
 import os
 import httpx
+import typer
+
+from typing import Optional
 from dotenv import load_dotenv
+from snyk_tags import __app_name__, __version__
 
 
 logging.basicConfig(
@@ -31,6 +35,7 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
+app = typer.Typer()
 
 def create_client(token: str) -> httpx.Client:
     return httpx.Client(
@@ -103,13 +108,32 @@ def apply_sast_tags_to_sast_projects(token: str, org_ids: list) -> None:
                         )
                     )
 
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"{__app_name__} v{__version__}")
+        raise typer.Exit()
 
-def main():
+@app.callback()
+def main(
+    version: Optional[bool] = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Show the application's version and exit",
+        callback=_version_callback,
+        is_eager=True,
+    ),
+) -> None:
+    return
+
+@app.command()
+def apply(group_id: str = typer.Argument(..., envvar=["GROUP_ID"]), token: str = typer.Argument(..., envvar=["SNYK_TOKEN"])):
+#def main():
     # Load variables from configuration file
     load_dotenv()
 
-    group_id = os.getenv("GROUP_ID")
-    token = os.getenv("AUTH_TOKEN")
+    #group_id = os.getenv("GROUP_ID")
+    #token = os.getenv("AUTH_TOKEN")
 
     logging.info(
         "This script will add the sast tag to every Snyk Code project in Snyk for easy filtering via the UI"
@@ -117,6 +141,3 @@ def main():
     org_ids = get_org_ids(token, group_id)
     apply_sast_tags_to_sast_projects(token, org_ids)
 
-
-if __name__ == "__main__":
-    main()

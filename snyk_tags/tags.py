@@ -1,12 +1,9 @@
 #! /usr/bin/env python3
 
 import logging
-import os
-import httpx
 import typer
 
 from typing import Optional
-from dotenv import load_dotenv
 from snyk_tags import __app_name__, __version__, apply
 
 

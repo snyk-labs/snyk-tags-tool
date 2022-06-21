@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "snyk-tags"
+version = "0.1.0"
+description = "Tool designed to add tags in bulk to Snyk projects"
+authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/EricFernandezSnyk/snyk-tags-tool"
+keywords =["snyk"]
+
+[tool.poetry.scripts]
+snyk-tags = "snyk_tags.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+typer = "^0.4.1"
+httpx = "^0.23.0"
+colorama = "^0.4.5"
+shellingham = "^1.4.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

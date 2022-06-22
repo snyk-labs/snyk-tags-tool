@@ -1,10 +1,10 @@
 # Snyk Tags Tool
 
-Snyk Tags is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the type
+Snyk Tags is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the type.
 
 Snyk Tags will update all projects of a type within a specific Snyk Group with either an SCA, SAST, IaC or Container tag to help filter projects by Snyk product.
 
-Currently it does not support custom tags or only applying the tags to a single Organisation.
+Currently it does not support custom tags.
 
 Once this is run, go into the UI and click on the tags filter in the projects page (left-hand menu). Select the Type tag and the product as the key. All your Snyk projects from a specific product will be shown via this filter.
 
@@ -48,3 +48,15 @@ OPTIONS:
   - Define the type of Snyk Container projects to tag
 - **[--scatype]**: ```snyk-tags apply sca --scatype=maven```
   - Define the type of Snyk Open Source projects to tag
+
+ARGS:
+
+- **[--group-id]**: ```snyk tags sast --group-id```
+  - Define the Group ID you want to apply the tags to
+  - Can also be imported as an environment variable
+- **[--org-id]**: ```snyk tags sast --group-id```
+  - Define the Organization ID you want to apply the tags to
+  - Can also be imported as an environment variable
+- **[--token]**: ```snyk-tags apply sast --token=xxx```
+  - Define the Snyk API Token you want to use (needs Group access by default)
+  - Can also be imported as an environment variable

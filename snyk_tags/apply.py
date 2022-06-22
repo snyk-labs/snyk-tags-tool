@@ -100,6 +100,10 @@ def sast(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
+        ),  org_id: str = typer.Option(
+            "", # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify one Organization ID if you only want to apply to one org"
         ), token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
@@ -109,9 +113,13 @@ def sast(group_id: str = typer.Option(
     logging.info(
         "This script will add the SAST tag to every Snyk Code project in Snyk for easy filtering via the UI"
     )
-    org_ids = get_org_ids(token, group_id)
-    apply_tags_to_projects(token, org_ids, type='sast', tag='SAST')
-
+    org = []
+    if org_id == '' or None:
+        org_ids = get_org_ids(token, group_id)
+        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST')
+    else:
+        org.append(org_id)
+        apply_tags_to_projects(token, org, type='sast', tag='SAST')
 
 # IaC Command
 @app.command()
@@ -119,6 +127,10 @@ def iac(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
+        ),  org_id: str = typer.Option(
+            "", # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify one Organization ID if you only want to apply to one org"
         ), token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
@@ -128,8 +140,13 @@ def iac(group_id: str = typer.Option(
     logging.info(
         "This script will add the IaC tag to every Snyk IaC project in Snyk for easy filtering via the UI"
     )
-    org_ids = get_org_ids(token, group_id)
-    apply_tags_to_projects(token, org_ids, type='iac', tag='IaC')
+    org = []
+    if org_id == '' or None:
+        org_ids = get_org_ids(token, group_id)
+        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC')
+    else:
+        org.append(org_id)
+        apply_tags_to_projects(token, org, type='iac', tag='IaC')
 
 # SCA Command
 @app.command()
@@ -137,6 +154,10 @@ def sca(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
+        ),  org_id: str = typer.Option(
+            "", # Default value of comamand,
+            envvar=["ORG_ID"],
+            help="Specify one Organization ID if you only want to apply to one org"
         ),  token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
@@ -150,8 +171,13 @@ def sca(group_id: str = typer.Option(
     logging.info(
         "This script will add the SCA tag to every Snyk Open Source project in Snyk for easy filtering via the UI"
     )
-    org_ids = get_org_ids(token, group_id)
-    apply_tags_to_projects(token, org_ids, scaType, tag='SCA')
+    org = []
+    if org_id == '' or None:
+        org_ids = get_org_ids(token, group_id)
+        apply_tags_to_projects(token, org_ids, scaType, tag='SCA')
+    else:
+        org.append(org_id)
+        apply_tags_to_projects(token, org, scaType, tag='SCA')
 
 # Container Command
 @app.command()
@@ -159,6 +185,10 @@ def container(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
+        ),  org_id: str = typer.Option(
+            "", # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify one Organization ID if you only want to apply to one org"
         ),  token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
@@ -172,8 +202,14 @@ def container(group_id: str = typer.Option(
     logging.info(
         "This script will add the Container tag to every Snyk Container project in Snyk for easy filtering via the UI"
     )
-    org_ids = get_org_ids(token, group_id)
-    apply_tags_to_projects(token, org_ids, containerType, tag='Container')
+    org = []
+    if org_id == '' or None:
+        org_ids = get_org_ids(token, group_id)
+        apply_tags_to_projects(token, org_ids, containerType, tag='Container')
+    else:
+        org.append(org_id)
+        apply_tags_to_projects(token, org, containerType, tag='Container')
+
 
 
 

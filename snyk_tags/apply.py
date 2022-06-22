@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import logging
+from typing import Optional, List
 import httpx
 import typer
 
@@ -43,12 +44,12 @@ def get_org_ids(token: str, group_id: str) -> list:
             org_ids.append(org["id"])
     return org_ids
 
-# SAST Command
-def apply_sast_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str
+# Apply tags
+def apply_tag_to_project(
+    client: httpx.Client, org_id: str, project_id: str, tag: str
 ) -> tuple:
     """
-    Apply the SAST tag to each given project
+    Apply the Container tag to each given project
 
     :param client:
     :param org_id:
@@ -57,15 +58,15 @@ def apply_sast_tag_to_project(
     """
     tag_data = {
         "key": "type",
-        "value": "sast",
+        "value": tag,
     }
     req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
 
     if req.status_code == 200:
-        logging.info(f"Successfully added tags to Project ID: {project_id}.")
+        logging.info(f"Successfully added {tag} tags to Project ID: {project_id}.")
 
     if req.status_code == 422:
-        logging.warning(f"SAST tag is already applied for Project ID: {project_id}.")
+        logging.warning(f"{tag} tag is already applied for Project ID: {project_id}.")
 
     if req.status_code == 404:
         logging.error(
@@ -75,9 +76,9 @@ def apply_sast_tag_to_project(
     return req.status_code, req.json()
 
 
-def apply_sast_tags_to_sast_projects(token: str, org_ids: list) -> None:
+def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str) -> None:
     """
-    Apply the tags to all SAST projects within all orgs given in a list
+    Apply the tags to all Container projects within all orgs given in a list
     :param token:
     :param org_ids:
     :return: None
@@ -86,13 +87,14 @@ def apply_sast_tags_to_sast_projects(token: str, org_ids: list) -> None:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects").json()
             for project in projects.get("projects"):
-                if project["type"] == "sast":
+                if project["type"] == type:
                     logging.debug(
-                        apply_sast_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"]
+                        apply_tag_to_project(
+                            client=client, org_id=org_id, project_id=project["id"], tag=tag
                         )
                     )
 
+# SAST Command
 @app.command()
 def sast(group_id: str = typer.Option(
             ..., 
@@ -108,59 +110,10 @@ def sast(group_id: str = typer.Option(
         "This script will add the sast tag to every Snyk Code project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
-    apply_sast_tags_to_sast_projects(token, org_ids)
+    apply_tags_to_projects(token, org_ids, type='sast', tag='SAST')
 
 
 # IaC Command
-def apply_iac_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str
-) -> tuple:
-    """
-    Apply the IaC tag to each given project
-
-    :param client:
-    :param org_id:
-    :param project_id:
-    :return: tuple of the status_code and dictionary of the JSON response
-    """
-    tag_data = {
-        "key": "type",
-        "value": "iac",
-    }
-    req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
-
-    if req.status_code == 200:
-        logging.info(f"Successfully added tags to Project ID: {project_id}.")
-
-    if req.status_code == 422:
-        logging.warning(f"IAC tag is already applied for Project ID: {project_id}.")
-
-    if req.status_code == 404:
-        logging.error(
-            f"Project not found, likely a READ-ONLY project. Project ID: {project_id}. Error message: {req.json()}."
-        )
-
-    return req.status_code, req.json()
-
-
-def apply_iac_tags_to_iac_projects(token: str, org_ids: list) -> None:
-    """
-    Apply the tags to all IAC projects within all orgs given in a list
-    :param token:
-    :param org_ids:
-    :return: None
-    """
-    with create_client(token=token) as client:
-        for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
-            for project in projects.get("projects"):
-                if project["type"] == "sast":
-                    logging.debug(
-                        apply_iac_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"]
-                        )
-                    )
-
 @app.command()
 def iac(group_id: str = typer.Option(
             ..., 
@@ -176,58 +129,9 @@ def iac(group_id: str = typer.Option(
         "This script will add the iac tag to every Snyk IaC project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
-    apply_iac_tags_to_iac_projects(token, org_ids)
+    apply_tags_to_projects(token, org_ids, type='iac', tag='IaC')
 
 # SCA Command
-def apply_sca_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str
-) -> tuple:
-    """
-    Apply the SCA tag to each given project
-
-    :param client:
-    :param org_id:
-    :param project_id:
-    :return: tuple of the status_code and dictionary of the JSON response
-    """
-    tag_data = {
-        "key": "type",
-        "value": "sca",
-    }
-    req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
-
-    if req.status_code == 200:
-        logging.info(f"Successfully added tags to Project ID: {project_id}.")
-
-    if req.status_code == 422:
-        logging.warning(f"SCA tag is already applied for Project ID: {project_id}.")
-
-    if req.status_code == 404:
-        logging.error(
-            f"Project not found, likely a READ-ONLY project. Project ID: {project_id}. Error message: {req.json()}."
-        )
-
-    return req.status_code, req.json()
-
-
-def apply_sca_tags_to_sca_projects(token: str, org_ids: list, scaType: str) -> None:
-    """
-    Apply the tags to all SCA projects within all orgs given in a list
-    :param token:
-    :param org_ids:
-    :return: None
-    """
-    with create_client(token=token) as client:
-        for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
-            for project in projects.get("projects"):
-                if project["type"] == scaType:
-                    logging.debug(
-                        apply_sca_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"]
-                        )
-                    )
-
 @app.command()
 def sca(group_id: str = typer.Option(
             ..., 
@@ -238,7 +142,7 @@ def sca(group_id: str = typer.Option(
             help="SNYK API token",
             envvar=["SNYK_TOKEN"]
         ),  scaType: str = typer.Option(
-            "maven",
+            "maven", # Default value of comamand
             help="Type of package to update tags: maven, npm"
         )
     ):
@@ -247,58 +151,9 @@ def sca(group_id: str = typer.Option(
         "This script will add the SCA tag to every Snyk Open Source project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
-    apply_sca_tags_to_sca_projects(token, org_ids, scaType)
+    apply_tags_to_projects(token, org_ids, scaType, tag='SCA')
 
 # Container Command
-def apply_container_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str
-) -> tuple:
-    """
-    Apply the Container tag to each given project
-
-    :param client:
-    :param org_id:
-    :param project_id:
-    :return: tuple of the status_code and dictionary of the JSON response
-    """
-    tag_data = {
-        "key": "type",
-        "value": "container",
-    }
-    req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
-
-    if req.status_code == 200:
-        logging.info(f"Successfully added tags to Project ID: {project_id}.")
-
-    if req.status_code == 422:
-        logging.warning(f"Container tag is already applied for Project ID: {project_id}.")
-
-    if req.status_code == 404:
-        logging.error(
-            f"Project not found, likely a READ-ONLY project. Project ID: {project_id}. Error message: {req.json()}."
-        )
-
-    return req.status_code, req.json()
-
-
-def apply_cont_tags_to_cont_projects(token: str, org_ids: list, scaType: str) -> None:
-    """
-    Apply the tags to all Container projects within all orgs given in a list
-    :param token:
-    :param org_ids:
-    :return: None
-    """
-    with create_client(token=token) as client:
-        for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
-            for project in projects.get("projects"):
-                if project["type"] == scaType:
-                    logging.debug(
-                        apply_container_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"]
-                        )
-                    )
-
 @app.command()
 def container(group_id: str = typer.Option(
             ..., 
@@ -309,7 +164,7 @@ def container(group_id: str = typer.Option(
             help="SNYK API token",
             envvar=["SNYK_TOKEN"]
         ),  containerType: str = typer.Option(
-            "deb",
+            "deb", # Default value of comamand
             help="Type of container to update tags: Dockerfile, deb"
         )
     ):
@@ -318,4 +173,8 @@ def container(group_id: str = typer.Option(
         "This script will add the container tag to every Snyk Container project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
-    apply_cont_tags_to_cont_projects(token, org_ids, containerType)
+    apply_tags_to_projects(token, org_ids, containerType, tag='Container')
+
+
+
+

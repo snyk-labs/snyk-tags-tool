@@ -57,7 +57,7 @@ def apply_tag_to_project(
     :return: tuple of the status_code and dictionary of the JSON response
     """
     tag_data = {
-        "key": "type",
+        "key": "Type",
         "value": tag,
     }
     req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
@@ -97,17 +97,17 @@ def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str) -> No
 # SAST Command
 @app.command()
 def sast(group_id: str = typer.Option(
-            ..., 
+            ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
         ), token: str = typer.Option(
-            ...,
+            ..., # Default value of comamand
             help="SNYK API token",
             envvar=["SNYK_TOKEN"])
     ):
 
     logging.info(
-        "This script will add the sast tag to every Snyk Code project in Snyk for easy filtering via the UI"
+        "This script will add the SAST tag to every Snyk Code project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
     apply_tags_to_projects(token, org_ids, type='sast', tag='SAST')
@@ -116,17 +116,17 @@ def sast(group_id: str = typer.Option(
 # IaC Command
 @app.command()
 def iac(group_id: str = typer.Option(
-            ..., 
+            ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
         ), token: str = typer.Option(
-            ...,
+            ..., # Default value of comamand
             help="SNYK API token",
             envvar=["SNYK_TOKEN"])
     ):
 
     logging.info(
-        "This script will add the iac tag to every Snyk IaC project in Snyk for easy filtering via the UI"
+        "This script will add the IaC tag to every Snyk IaC project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
     apply_tags_to_projects(token, org_ids, type='iac', tag='IaC')
@@ -134,11 +134,11 @@ def iac(group_id: str = typer.Option(
 # SCA Command
 @app.command()
 def sca(group_id: str = typer.Option(
-            ..., 
+            ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
         ),  token: str = typer.Option(
-            ...,
+            ..., # Default value of comamand
             help="SNYK API token",
             envvar=["SNYK_TOKEN"]
         ),  scaType: str = typer.Option(
@@ -156,11 +156,11 @@ def sca(group_id: str = typer.Option(
 # Container Command
 @app.command()
 def container(group_id: str = typer.Option(
-            ..., 
+            ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
             envvar=["GROUP_ID"]
         ),  token: str = typer.Option(
-            ...,
+            ..., # Default value of comamand
             help="SNYK API token",
             envvar=["SNYK_TOKEN"]
         ),  containerType: str = typer.Option(
@@ -170,7 +170,7 @@ def container(group_id: str = typer.Option(
     ):
 
     logging.info(
-        "This script will add the container tag to every Snyk Container project in Snyk for easy filtering via the UI"
+        "This script will add the Container tag to every Snyk Container project in Snyk for easy filtering via the UI"
     )
     org_ids = get_org_ids(token, group_id)
     apply_tags_to_projects(token, org_ids, containerType, tag='Container')

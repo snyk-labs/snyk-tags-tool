@@ -21,11 +21,6 @@ def _version_callback(value: bool) -> None:
         typer.echo(f"{__app_name__} v{__version__}")
         raise typer.Exit()
 
-def _name_callback(value: bool) -> None:
-    if value:
-        typer.echo(f"{__app_name__}")
-        raise typer.Exit()
-
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
@@ -34,13 +29,6 @@ def main(
         "-v",
         help="Show the application's version and exit",
         callback=_version_callback,
-        is_eager=True,
-    ), name: Optional[bool] = typer.Option(
-        None,
-        "--name",
-        "-n",
-        help="Show the application's name and exit",
-        callback=_name_callback,
         is_eager=True,
     )
 ) -> None:

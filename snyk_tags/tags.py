@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 
 app = typer.Typer()
-app.add_typer(apply.app, name="apply")
+app.add_typer(apply.app, name="apply", help="Apply tags to the desired content")
 
 def _version_callback(value: bool) -> None:
     if value:

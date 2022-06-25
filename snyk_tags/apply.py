@@ -3,6 +3,7 @@
 import logging
 from typing import Optional, List
 import httpx
+from tomlkit import key
 import typer
 
 from snyk_tags import __app_name__, __version__
@@ -46,7 +47,7 @@ def get_org_ids(token: str, group_id: str) -> list:
 
 # Apply tags
 def apply_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str, tag: str
+    client: httpx.Client, org_id: str, project_id: str, tag: str, key: str
 ) -> tuple:
     """
     Apply the Container tag to each given project
@@ -57,7 +58,7 @@ def apply_tag_to_project(
     :return: tuple of the status_code and dictionary of the JSON response
     """
     tag_data = {
-        "key": "Type",
+        "key": key,
         "value": tag,
     }
     req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
@@ -76,7 +77,7 @@ def apply_tag_to_project(
     return req.status_code, req.json()
 
 
-def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str) -> None:
+def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str, key: str) -> None:
     """
     Apply the tags to all Container projects within all orgs given in a list
     :param token:
@@ -90,12 +91,12 @@ def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str) -> No
                 if project["type"] == type:
                     logging.debug(
                         apply_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"], tag=tag
+                            client=client, org_id=org_id, project_id=project["id"], tag=tag, key=key
                         )
                     )
 
 # SAST Command
-@app.command()
+@app.command(help="Apply SAST tag to Snyk Code files")
 def sast(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -116,13 +117,13 @@ def sast(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST')
+        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='sast', tag='SAST')
+        apply_tags_to_projects(token, org, type='sast', tag='SAST', key='Type')
 
 # IaC Command
-@app.command()
+@app.command(help="Apply IaC tag to Snyk IaC files")
 def iac(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -143,13 +144,13 @@ def iac(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC')
+        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='iac', tag='IaC')
+        apply_tags_to_projects(token, org, type='iac', tag='IaC', key='Type')
 
 # SCA Command
-@app.command()
+@app.command(help="Apply SCA tag to the desired content type (default: maven)")
 def sca(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -174,13 +175,13 @@ def sca(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, scaType, tag='SCA')
+        apply_tags_to_projects(token, org_ids, scaType, tag='SCA', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, scaType, tag='SCA')
+        apply_tags_to_projects(token, org, scaType, tag='SCA', key='Type')
 
 # Container Command
-@app.command()
+@app.command(help="Apply Container tag to the desired content type (default: deb)")
 def container(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -205,12 +206,47 @@ def container(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, containerType, tag='Container')
+        apply_tags_to_projects(token, org_ids, containerType, tag='Container', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, containerType, tag='Container')
+        apply_tags_to_projects(token, org, containerType, tag='Container', key='Type')
 
+# Custom Command
+@app.command(help="Apply custom tags to the desired content type")
+def custom(group_id: str = typer.Option(
+            ..., # Default value of comamand
+            help="Group ID of the Snyk Group you want to apply the tags to",
+            envvar=["GROUP_ID"]
+        ),  org_id: str = typer.Option(
+            "", # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify one Organization ID if you only want to apply to one org"
+        ),  token: str = typer.Option(
+            ..., # Default value of comamand
+            help="SNYK API token",
+            envvar=["SNYK_TOKEN"]
+        ),  contentType: str = typer.Option(
+            ..., # Default value of comamand
+            help="Type of content to update value to: sast, iac, deb, Dockerfile, maven, npm..."
+        ),  tagKey: str = typer.Option(
+            ..., # Default value of comamand
+            help="Tag key: identifier of the tag"
+        ),  tagValue: str = typer.Option(
+            ..., # Default value of comamand
+            help="Tag value: value of the tag"
+        )
+    ):
 
+    logging.info(
+        "This script will add the Container tag to every Snyk Container project in Snyk for easy filtering via the UI"
+    )
+    org = []
+    if org_id == '' or None:
+        org_ids = get_org_ids(token, group_id)
+        apply_tags_to_projects(token, org_ids, contentType, tagValue, tagKey)
+    else:
+        org.append(org_id)
+        apply_tags_to_projects(token, org, contentType, tagValue, tagKey)
 
 
 

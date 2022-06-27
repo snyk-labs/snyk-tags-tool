@@ -3,7 +3,6 @@
 import logging
 from typing import Optional, List
 import httpx
-from tomlkit import key
 import typer
 
 from snyk_tags import __app_name__, __version__

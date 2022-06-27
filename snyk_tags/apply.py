@@ -150,7 +150,7 @@ def iac(group_id: str = typer.Option(
         apply_tags_to_projects(token, org, type='iac', tag='IaC', key='Type')
 
 # SCA Command
-@app.command(help="Apply SCA tag to the desired content type (default: maven)")
+@app.command(help="Apply SCA tag to the preferred project type (default: maven)")
 def sca(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -181,7 +181,7 @@ def sca(group_id: str = typer.Option(
         apply_tags_to_projects(token, org, scaType, tag='SCA', key='Type')
 
 # Container Command
-@app.command(help="Apply Container tag to the desired content type (default: deb)")
+@app.command(help="Apply Container tag to the preferred project type (default: deb)")
 def container(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -212,7 +212,7 @@ def container(group_id: str = typer.Option(
         apply_tags_to_projects(token, org, containerType, tag='Container', key='Type')
 
 # Custom Command
-@app.command(help="Apply custom tags to the desired content type")
+@app.command(help="Apply custom tags to the preferred project type")
 def custom(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -225,9 +225,9 @@ def custom(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
             envvar=["SNYK_TOKEN"]
-        ),  contentType: str = typer.Option(
+        ),  projectType: str = typer.Option(
             ..., # Default value of comamand
-            help="Type of content to update value to: sast, iac, deb, Dockerfile, maven, npm..."
+            help="Type of project to update value to: sast, iac, deb, Dockerfile, maven, npm..."
         ),  tagKey: str = typer.Option(
             ..., # Default value of comamand
             help="Tag key: identifier of the tag"
@@ -243,10 +243,10 @@ def custom(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, contentType, tagValue, tagKey)
+        apply_tags_to_projects(token, org_ids, projectType, tagValue, tagKey)
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, contentType, tagValue, tagKey)
+        apply_tags_to_projects(token, org, projectType, tagValue, tagKey)
 
 
 

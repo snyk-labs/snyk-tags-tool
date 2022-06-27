@@ -13,12 +13,12 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
-app = typer.Typer()
-app.add_typer(apply.app, name="apply", help="Apply tags to the desired content")
+app = typer.Typer(help="Use snyk-tags to apply tagging to a set of Snyk projects based on the project type")
+app.add_typer(apply.app, name="apply", help="Apply tags to the different project types")
 
 def _version_callback(value: bool) -> None:
     if value:
-        typer.echo(f"{__app_name__} v{__version__}")
+        typer.echo(f"snyk-tags v{__version__}")
         raise typer.Exit()
 
 @app.callback()

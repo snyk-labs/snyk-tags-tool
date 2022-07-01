@@ -116,10 +116,10 @@ def sast(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST', key='Type')
+        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST', key='Product')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='sast', tag='SAST', key='Type')
+        apply_tags_to_projects(token, org, type='sast', tag='SAST', key='Product')
 
 # IaC Command
 @app.command(help="Apply IaC tag to Snyk IaC files")
@@ -143,10 +143,10 @@ def iac(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC', key='Type')
+        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC', key='Product')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='iac', tag='IaC', key='Type')
+        apply_tags_to_projects(token, org, type='iac', tag='IaC', key='Product')
 
 # SCA Command
 @app.command(help="Apply SCA tag to the preferred project type (default: maven)")
@@ -174,10 +174,10 @@ def sca(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, scaType, tag='SCA', key='Type')
+        apply_tags_to_projects(token, org_ids, scaType, tag='SCA', key='Product')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, scaType, tag='SCA', key='Type')
+        apply_tags_to_projects(token, org, scaType, tag='SCA', key='Product')
 
 # Container Command
 @app.command(help="Apply Container tag to the preferred project type (default: deb)")
@@ -205,10 +205,10 @@ def container(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, containerType, tag='Container', key='Type')
+        apply_tags_to_projects(token, org_ids, containerType, tag='Container', key='Product')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, containerType, tag='Container', key='Type')
+        apply_tags_to_projects(token, org, containerType, tag='Container', key='Product')
 
 # Custom Command
 @app.command(help="Apply custom tags to the preferred project type")

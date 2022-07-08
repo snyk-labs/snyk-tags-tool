@@ -13,7 +13,7 @@ snyk-tags = "snyk_tags.tags:app"
 
 [tool.poetry.dependencies]
 python = ">=3.6,<4.0"
-typer = "^0.5.0"
+typer = ">=0.5.0"
 httpx = "^0.20.0"
 colorama = "^0.4.5"
 shellingham = "^1.4.0"

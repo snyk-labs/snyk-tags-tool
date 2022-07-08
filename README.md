@@ -1,12 +1,15 @@
 # Snyk Tags Tool
 
-Snyk Tags is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the type.
+Snyk Tags is a CLI tool with one purpose:
+- Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization
 
-Snyk Tags will update all projects of a type within a specific Snyk Group with either an SCA, SAST, IaC or Container tag to help filter projects by Snyk product.
+Snyk Tags is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the product type.
 
-You can also specify applying the tags to a specific Snyk organization and create your own custom tags.
+Snyk Tags will update all projects of the specified product type within a Snyk Group or Organization with the product's tag.
 
-Once this is run, go into the UI and click on the tags filter in the projects page (left-hand menu). Select the Type tag and the product as the key. All your Snyk projects from a specific product will be shown via this filter.
+You can also specify a custom tag for the products.
+
+Once you run snyk-tags, go into the UI, naviagate to the projects page and find the tags filter options on the left-hand menu. Select the Product tag and the product as the key. All your Snyk projects from a specific product will be shown via this filter.
 
 ## Installation and requirements
 
@@ -29,6 +32,19 @@ poetry install # To install dependencies
 python -m snyk-tags # To run snyk-tags
 ```
 
+## Examples
+
+I want to filter all my Snyk Code projects to the whole Snyk Group:
+```
+snyk-tags apply sast --groupid=abc --token=abc
+```
+
+I want to filter all my npm Snyk Open Source projects within a specific Snyk Organization:
+```
+snyk-tags apply sast --scatype=npm --orgid=abc --token=abc
+```
+
+
 ## Usage
 
 **Usage:** snyk-tags [OPTIONS] COMMAND [ARGS]
@@ -37,10 +53,15 @@ python -m snyk-tags # To run snyk-tags
 
 - apply: ```snyk-tags apply --help```
   - container: ```snyk-tags apply container```
+    - Used to tag Snyk Container projects [default: deb]
   - iac: ```snyk-tags apply iac```
+    - Used to tag Snyk IaC projects [default: iac]
   - sast: ```snyk-tags apply sast```
+    - Used to tag Snyk Code projects [default: sast]
   - sca: ```snyk-tags apply sca```
+    - Used to tag Snyk Open Source projects [default: mvn]
   - custom: ```snyk-tags apply custom```
+    - Used to create a custom tag for the projects
 
 **OPTIONS**:
 
@@ -58,12 +79,12 @@ python -m snyk-tags # To run snyk-tags
 
 **ARGS**:
 
-- **[--group-id]**: ```snyk tags sast --group-id```
+- **[--group-id]**: ```snyk tags sast --group-id=abc```
   - Define the Group ID you want to apply the tags to
   - Can also be imported as an environment variable
-- **[--org-id]**: ```snyk tags sast --group-id```
+- **[--org-id]**: ```snyk tags sast --org-id=abc```
   - Define the Organization ID you want to apply the tags to
   - Can also be imported as an environment variable
-- **[--token]**: ```snyk-tags apply sast --token=xxx```
+- **[--token]**: ```snyk-tags apply sast --token=abc```
   - Define the Snyk API Token you want to use (needs Group access by default)
   - Can also be imported as an environment variable

@@ -24,9 +24,19 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - name: Publish to pypi
-        uses: coveooss/pypi-publish-with-poetry@v1.0.0
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'EricFernandezSnyk' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.0.0
         with:
-          project-name: snyk-tags
-          pypi-token: ${{ secrets.PYPI_TOKEN }}
+          python-version: 3.8
+      - name: Install poetry
+        run: pip install poetry==1.1.6
+      - uses: bjoluc/semantic-release-config-poetry@v1
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          

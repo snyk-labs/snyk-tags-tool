@@ -33,10 +33,7 @@ jobs:
       - uses: actions/setup-python@v4.0.0
         with:
           python-version: 3.8
-      - name: Install poetry
-        run: pip install poetry==1.1.6
-      - uses: bjoluc/semantic-release-config-poetry@v1
-        with:
+      - name: Publish python poetry package
+        uses: JRubics/poetry-publish@v1.11
           pypi_token: ${{ secrets.PYPI_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           

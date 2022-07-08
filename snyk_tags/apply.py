@@ -107,7 +107,12 @@ def sast(group_id: str = typer.Option(
         ), token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
-            envvar=["SNYK_TOKEN"])
+            envvar=["SNYK_TOKEN"]
+        ),  sastType: str = typer.Option(
+            "sast", # Default value of comamand
+            help="Type of package to update tags: sast"
+        )
+            
     ):
 
     logging.info(
@@ -116,10 +121,10 @@ def sast(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='sast', tag='SAST', key='Type')
+        apply_tags_to_projects(token, org_ids, type=sastType, tag='SAST', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='sast', tag='SAST', key='Type')
+        apply_tags_to_projects(token, org, type=sastType, tag='SAST', key='Type')
 
 # IaC Command
 @app.command(help="Apply IaC tag to Snyk IaC files")
@@ -134,7 +139,11 @@ def iac(group_id: str = typer.Option(
         ), token: str = typer.Option(
             ..., # Default value of comamand
             help="SNYK API token",
-            envvar=["SNYK_TOKEN"])
+            envvar=["SNYK_TOKEN"]
+        ),  iacType: str = typer.Option(
+            "terraformconfig", # Default value of comamand
+            help="Type of package to update tags: terraformconfig, cloudformationconfig, k8sconfig"
+        )
     ):
 
     logging.info(
@@ -143,10 +152,10 @@ def iac(group_id: str = typer.Option(
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type='iac', tag='IaC', key='Type')
+        apply_tags_to_projects(token, org_ids, type=iacType, tag='IaC', key='Type')
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type='iac', tag='IaC', key='Type')
+        apply_tags_to_projects(token, org, type=iacType, tag='IaC', key='Type')
 
 # SCA Command
 @app.command(help="Apply SCA tag to the preferred project type (default: maven)")

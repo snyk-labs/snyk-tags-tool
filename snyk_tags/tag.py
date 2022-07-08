@@ -47,14 +47,6 @@ def get_org_ids(token: str, group_id: str) -> list:
 def apply_tag_to_project(
     client: httpx.Client, org_id: str, project_id: str, tag: str, key: str
 ) -> tuple:
-    """
-    Apply the Container tag to each given project
-
-    :param client:
-    :param org_id:
-    :param project_id:
-    :return: tuple of the status_code and dictionary of the JSON response
-    """
     tag_data = {
         "key": key,
         "value": tag,
@@ -73,12 +65,6 @@ def apply_tag_to_project(
     return req.status_code, req.json()
 
 def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str, key: str) -> None:
-    """
-    Apply the tags to all Container projects within all orgs given in a list
-    :param token:
-    :param org_ids:
-    :return: None
-    """
     with create_client(token=token) as client:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects").json()
@@ -111,7 +97,7 @@ def sast(group_id: str = typer.Option(
         )
     ):
 
-    typer.echo(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI")
+    typer.secho(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI", bold=True)
 
     org = []
     if org_id == '' or None:
@@ -142,7 +128,7 @@ def iac(group_id: str = typer.Option(
         )
     ):
 
-    typer.echo(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI")
+    typer.secho(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI", bold=True)
 
     org = []
     if org_id == '' or None:
@@ -173,7 +159,7 @@ def sca(group_id: str = typer.Option(
         )
     ):
 
-    typer.echo(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI")
+    typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
 
     org = []
     if org_id == '' or None:
@@ -204,7 +190,7 @@ def container(group_id: str = typer.Option(
         )
     ):
 
-    typer.echo(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI")
+    typer.secho(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI", bold=True)
 
     org = []
     if org_id == '' or None:
@@ -240,7 +226,7 @@ def custom(group_id: str = typer.Option(
         )
     ):
 
-    typer.echo(f"\nAdding the tag key {tagKey} and tag value {tagValue} to {projectType} projects in Snyk for easy filtering via the UI")
+    typer.secho(f"\nAdding the tag key {tagKey} and tag value {tagValue} to {projectType} projects in Snyk for easy filtering via the UI", bold=True)
     org = []
     if org_id == '' or None:
         org_ids = get_org_ids(token, group_id)

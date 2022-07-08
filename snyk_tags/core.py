@@ -3,7 +3,7 @@
 import typer
 
 from typing import Optional
-from snyk_tags import __app_name__, __version__, apply, list, collection
+from snyk_tags import __app_name__, __version__, list, collection, tag
 
 snyk = typer.style("snyk-tags", bold=True)
 snykcmd = typer.style("snyk-tags apply --help", bold=True, fg=typer.colors.MAGENTA)
@@ -13,7 +13,7 @@ app = typer.Typer(
     add_completion=False,
     no_args_is_help=True
     )
-app.add_typer(apply.app, name="apply", help="Apply product/custom tags based on project type, select which tag to apply")
+app.add_typer(tag.app, name="tag", help="Apply product/custom tags based on project type, select which tag to apply")
 app.add_typer(list.app, name="list", help="List all project types of a Snyk product")
 app.add_typer(collection.app, name="collection", help="Apply custom tags to all projects within a collection e.g Git repo")
 

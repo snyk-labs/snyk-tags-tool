@@ -92,7 +92,7 @@ def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str, key: 
 
 # SAST Command
 sasttypes = typer.style("\n sast", bold=True, fg=typer.colors.MAGENTA)
-@app.command(help="Apply SAST tag to Snyk Code projects (default: sast")
+@app.command(help="Apply Code tag to Snyk Code projects (default: sast")
 def sast(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",

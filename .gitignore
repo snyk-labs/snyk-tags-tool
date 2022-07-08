@@ -5,3 +5,5 @@ snyk_tags.egg-info
 build
 .vscode
 dist
+.DS_Store
+

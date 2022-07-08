@@ -110,7 +110,7 @@ def sast(group_id: str = typer.Option(
             envvar=["SNYK_TOKEN"]
         ),  sastType: str = typer.Option(
             "sast", # Default value of comamand
-            help="Type of package to update tags: sast"
+            help="Type of Snyk Code projects to apply tags to: sast"
         )
             
     ):
@@ -142,12 +142,12 @@ def iac(group_id: str = typer.Option(
             envvar=["SNYK_TOKEN"]
         ),  iacType: str = typer.Option(
             "terraformconfig", # Default value of comamand
-            help="Type of package to update tags: terraformconfig, cloudformationconfig, k8sconfig"
+            help="Type of Snyk IaC projects to apply tags to: terraformconfig, cloudformationconfig, k8sconfig, terraformplan, helmconfig, cloudformationconfig, armconfig"
         )
     ):
 
     logging.info(
-        "This script will add the IaC tag to every Snyk IaC project in Snyk for easy filtering via the UI"
+        "This script will add the IaC tag to Snyk IaC projects in Snyk for easy filtering via the UI"
     )
     org = []
     if org_id == '' or None:

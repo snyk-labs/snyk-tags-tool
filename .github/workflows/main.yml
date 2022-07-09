@@ -27,4 +27,9 @@ jobs:
         uses: JRubics/poetry-publish@v1.11
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
+      - name: Publish Package and create Tag and Releases
+        uses: Commandcracker/pypi-publish@v1
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           

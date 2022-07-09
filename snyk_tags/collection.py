@@ -56,7 +56,7 @@ def apply_tags_to_projects(token: str, org_ids: list, name: str, tag: str, key: 
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
 
 @app.command(help=f"Apply a custom tag to a project collection\n\n Use the name you see in the collection as the name: name={repoexample} to tag everything under that repo or CLI import")
-def apply(org_id: str = typer.Option(
+def tag(org_id: str = typer.Option(
             ..., # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify one or more Organization ID where you want to apply the tag"

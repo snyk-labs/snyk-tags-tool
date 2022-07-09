@@ -61,5 +61,5 @@ snyk-tags tag sca --scatype=npm --org-id=abc --token=abc
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo as ```project:snyk```
 
 ``` bash
-snyk-tags collection apply --collectionname=snyk-labs/nodejs-goof --org-id=abc --token=abc --tagkey=project --tagvalue=snyk
+snyk-tags collection tag --collectionname=snyk-labs/nodejs-goof --org-id=abc --token=abc --tagkey=project --tagvalue=snyk
 ```

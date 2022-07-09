@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "snyk-tags"
-version = "0.2.2"
+version = "0.3.0"
 description = "Tool designed to add tags in bulk to Snyk projects"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"

@@ -1,15 +1,27 @@
 # Snyk Tags Tool
 
-Snyk Tags is a CLI tool with one purpose:
-- Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization
+Snyk Tags is a CLI tool with two purposes:
 
-Snyk Tags is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the product type.
+- Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization - using ```snyk-tags tag```
+- Help filter Snyk projects by applying tags to a collection of projects (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags collection```
 
-Snyk Tags will update all projects of the specified product type within a Snyk Group or Organization with the product's tag.
+### snyk-tags tag
+
+```snyk-tags tag``` is a CLI tool that uses the Snyk Project API to assign tags in bulk to Snyk projects based on the product type.
+
+```snyk-tags tag``` will update all projects of the specified product type within a Snyk Group or Organization with the product's tag.
 
 You can also specify a custom tag for the products.
 
-Once you run snyk-tags, go into the UI, naviagate to the projects page and find the tags filter options on the left-hand menu. Select the Product tag and the product as the key. All your Snyk projects from a specific product will be shown via this filter.
+### snyk-tags collection
+
+```snyk-tags collection``` uses the Snyk Project API to assign tags to all projects within a collection. A collection encompasses one or more projects in Snyk, for example:
+
+- **snyk-labs/nodejs-goof** is a collection from a git import
+- **library/httpd** is a collection from a container import
+- **/snyk-labs/nodejs-goof** is a collection from a CLI import
+
+Once you run ```snyk-tags```, go into the UI, naviagate to the projects page and find the tags filter options on the left-hand menu. Select the tag you have applied and you will visualize all projects associated.
 
 ## Installation and requirements
 
@@ -35,56 +47,19 @@ python -m snyk-tags # To run snyk-tags
 ## Examples
 
 I want to filter all my Snyk Code projects to the whole Snyk Group:
-```
-snyk-tags apply sast --groupid=abc --token=abc
-```
 
-I want to filter all my npm Snyk Open Source projects within a specific Snyk Organization:
-```
-snyk-tags apply sast --scatype=npm --orgid=abc --token=abc
+``` bash
+snyk-tags tag sast --group-id=abc --token=abc
 ```
 
+I want to filter all my ```npm``` Snyk Open Source projects within a specific Snyk Organization:
 
-## Usage
+``` bash
+snyk-tags tag sca --scatype=npm --org-id=abc --token=abc
+```
 
-**Usage:** snyk-tags [OPTIONS] COMMAND [ARGS]
+I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo as ```project:snyk```
 
-**COMMAND**:
-
-- apply: ```snyk-tags apply --help```
-  - container: ```snyk-tags apply container```
-    - Used to tag Snyk Container projects [default: deb]
-  - iac: ```snyk-tags apply iac```
-    - Used to tag Snyk IaC projects [default: iac]
-  - sast: ```snyk-tags apply sast```
-    - Used to tag Snyk Code projects [default: sast]
-  - sca: ```snyk-tags apply sca```
-    - Used to tag Snyk Open Source projects [default: mvn]
-  - custom: ```snyk-tags apply custom```
-    - Used to create a custom tag for the projects
-
-**OPTIONS**:
-
-- **[-v, --version]**: ```snyk tags -v```
-- **[--containertype]**: ```snyk-tags apply container --containertype=deb```
-  - Define the type of Snyk Container projects to tag
-- **[--scatype]**: ```snyk-tags apply sca --scatype=maven```
-  - Define the type of Snyk Open Source projects to tag
-- **[--projecttype]**: ```snyk-tags apply custom --projecttype=maven --tagkey=Type --tagvalue=Value```
-  - Define the type of project to tag, must be accompanied by ```tagkey``` and ```tagvalue```
-- **[--tagkey]**: ```snyk-tags apply custom --projecttype=deb --tagkey=Type --tagvalue=Value```
-  - Define the custom tag
-- **[--tagvalue]**: ```snyk-tags apply custom --projecttype=iac --tagkey=Type --tagvalue=Value```
-  - Define the value of the custom tag
-
-**ARGS**:
-
-- **[--group-id]**: ```snyk tags sast --group-id=abc```
-  - Define the Group ID you want to apply the tags to
-  - Can also be imported as an environment variable
-- **[--org-id]**: ```snyk tags sast --org-id=abc```
-  - Define the Organization ID you want to apply the tags to
-  - Can also be imported as an environment variable
-- **[--token]**: ```snyk-tags apply sast --token=abc```
-  - Define the Snyk API Token you want to use (needs Group access by default)
-  - Can also be imported as an environment variable
+``` bash
+snyk-tags collection apply --collectionname=snyk-labs/nodejs-goof --org-id=abc --token=abc --tagkey=project --tagvalue=snyk
+```

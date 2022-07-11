@@ -19,21 +19,18 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   release:
-    name: Release
+    name: Build and Release
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'EricFernandezSnyk' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4.0.0
         with:
           python-version: 3.8
+      - name: Test snyk-tags
+        run: pip install pytest
+             pytest
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v1.11
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
-      - name: Publish Package and create Tag and Releases
-        uses: Commandcracker/pypi-publish@v1
-        with:
-          password: ${{ secrets.PYPI_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          
+

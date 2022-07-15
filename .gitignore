@@ -6,4 +6,6 @@ build
 .vscode
 dist
 .DS_Store
+*/.DS_Store
+tests/__pycache__
 

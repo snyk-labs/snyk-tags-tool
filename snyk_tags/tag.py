@@ -78,7 +78,7 @@ def apply_tags_to_projects(token: str, org_ids: list, type: str, tag: str, key: 
 
 # SAST Command
 sasttypes = typer.style("\n sast", bold=True, fg=typer.colors.MAGENTA)
-@app.command(help="Apply Code tag to Snyk Code projects (default: sast")
+@app.command(help="Apply Code tag to Snyk Code projects (default: sast)")
 def sast(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",
@@ -109,7 +109,7 @@ def sast(group_id: str = typer.Option(
 
 # IaC Command
 iactypes = typer.style("\n terraformconfig\n terraformplan\n k8sconfig\n helmconfig\n cloudformationconfig\n armconfig", bold=True, fg=typer.colors.MAGENTA)
-@app.command(help="Apply IaC tag to Snyk IaC projects (default: terraformconfig")
+@app.command(help="Apply IaC tag to Snyk IaC projects (default: terraformconfig)")
 def iac(group_id: str = typer.Option(
             ..., # Default value of comamand
             help="Group ID of the Snyk Group you want to apply the tags to",

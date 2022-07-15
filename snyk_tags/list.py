@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-from matplotlib.pyplot import table
 import typer
 from rich.console import Console
 from rich.table import Table

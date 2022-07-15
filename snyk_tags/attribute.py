@@ -1,8 +1,6 @@
 #! /usr/bin/env python3
 
 import logging
-from attr import attr
-from click import echo
 import httpx
 import typer
 import json

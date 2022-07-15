@@ -22,7 +22,7 @@ app.add_typer(attribute.app, name="attribute", help="Apply attributes to all pro
 
 
 def main():
-    print(snyk)
+    return True
 
 def _version_callback(value: bool) -> None:
     if value:

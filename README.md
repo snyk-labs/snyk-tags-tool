@@ -8,11 +8,11 @@ Snyk Tags is a CLI tool with three purposes:
 
 ### snyk-tags tag
 
-```snyk-tags tag``` is a CLI tool that uses the Snyk Project Tag API to assign tags in bulk to Snyk projects based on the product type.
+```snyk-tags tag``` is a CLI tool that uses the Snyk Project Tag API to assign tags in bulk to Snyk projects based on the product.
 
-```snyk-tags tag``` will update all projects of the specified product type within a Snyk Group or Organization with the product's tag.
+```snyk-tags tag``` will update all projects of the specified product within a Snyk Group or Organization with the product's tag.
 
-You can also specify a custom tag for the products.
+You can also specify a custom tag for the specific project types.
 
 ### snyk-tags collection
 

@@ -24,8 +24,9 @@ jobs:
         with:
           python-version: 3.8
       - name: Test snyk-tags
-        run: pip install pytest
-        run: pytest
+        run: |
+          pip install pytest
+          pytest
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v1.11
         with:

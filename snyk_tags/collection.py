@@ -22,7 +22,7 @@ def create_client(token: str) -> httpx.Client:
 
 # Apply tags to a specific project
 def apply_tag_to_project(
-    client: httpx.Client, org_id: str, project_id: str, tag: str, key: str
+    client: httpx.Client, org_id: str, project_id: str, tag: str, key: str, project_name: str
 ) -> tuple:
     tag_data = {
         "key": key,
@@ -32,13 +32,13 @@ def apply_tag_to_project(
     req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
     
     if req.status_code == 200:
-        logging.info(f"Successfully added {tag} tags to Project ID: {project_id}.")
+        logging.info(f"Successfully added {tag} tags to Project: {project_name}.")
 
     if req.status_code == 422:
-        logging.warning(f"{tag} tag is already applied for Project ID: {project_id}.")
+        logging.warning(f"{tag} tag is already applied for Project: {project_name}.")
 
     if req.status_code == 404:
-        logging.error(f"Project not found, likely a READ-ONLY project. Project ID: {project_id}. Error message: {req.json()}.")
+        logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
     
     return req.status_code, req.json()
 
@@ -50,7 +50,7 @@ def apply_tags_to_projects(token: str, org_ids: list, name: str, tag: str, key: 
             for project in projects.get("projects"):
                 if project["name"].startswith(name):
                     apply_tag_to_project(
-                            client=client, org_id=org_id, project_id=project["id"], tag=tag, key=key
+                            client=client, org_id=org_id, project_id=project["id"], tag=tag, key=key, project_name=project["name"]
                         )
 
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)

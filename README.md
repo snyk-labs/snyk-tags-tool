@@ -22,6 +22,8 @@ You can also specify a custom tag for the specific project types.
 - **library/httpd** is a collection from a container import
 - **/snyk-labs/nodejs-goof** is a collection from a CLI import
 
+You can also use ```snyk-tags collection``` to add your Github repository code owner as a tag to an imported repo with  ```snyk-tags collection github```
+
 [List all project types](#list-of-all-project-types)
 
 ### snyk-tags attribute
@@ -83,6 +85,12 @@ I want to add attributes to all projects within my ```snyk-labs/python-goof``` r
 
 ``` bash
 snyk-tags attribute collection  --collectionname=snyk-labs/python-goof --org-id=abc --token=abc --criticality=critical --environment=backend --lifecycle=production
+```
+
+I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```Owner:EricFernandezSnyk```
+
+``` bash
+snyk-tags collection github --reponame=snyk-labs/nodejs-goof --org-id=abc --snyktoken=abc --githubtoken=abc
 ```
 
 ## Types of projects and attributes

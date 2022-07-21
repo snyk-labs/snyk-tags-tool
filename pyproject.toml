@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "snyk-tags"
-version = "0.5.0"
+version = "0.6.0"
 description = "Tool designed to add tags in bulk to Snyk projects"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"
@@ -18,6 +18,7 @@ httpx = "^0.23.0"
 colorama = "^0.4.5"
 shellingham = "^1.4.0"
 rich = ">=10.11.0"
+PyGithub = "^1.55"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

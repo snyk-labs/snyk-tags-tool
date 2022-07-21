@@ -28,7 +28,6 @@ jobs:
           pip install pytest
           pip install poetry
           poetry install
-          pytest
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v1.11
         with:

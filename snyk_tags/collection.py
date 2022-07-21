@@ -3,6 +3,7 @@
 import logging
 import httpx
 import typer
+from github import Github
 
 from snyk_tags import __app_name__, __version__
 
@@ -32,17 +33,14 @@ def apply_tag_to_project(
     req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
     
     if req.status_code == 200:
-        logging.info(f"Successfully added {tag} tags to Project: {project_name}.")
-
+        logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
     if req.status_code == 422:
-        logging.warning(f"{tag} tag is already applied for Project: {project_name}.")
-
+        logging.warning(f"{tag_data} tag is already applied for Project: {project_name}.")
     if req.status_code == 404:
         logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
-    
     return req.status_code, req.json()
 
-#
+# Tagging loop
 def apply_tags_to_projects(token: str, org_ids: list, name: str, tag: str, key: str) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
@@ -53,16 +51,29 @@ def apply_tags_to_projects(token: str, org_ids: list, name: str, tag: str, key: 
                             client=client, org_id=org_id, project_id=project["id"], tag=tag, key=key, project_name=project["name"]
                         )
 
+# GitHub Tagging Loop
+def apply_github_owner_to_repo(snyktoken: str, org_ids: list, name: str, githubtoken: str) -> None:
+    g = Github(githubtoken)
+    with create_client(token=snyktoken) as client:
+        for org_id in org_ids:
+            projects = client.post(f"org/{org_id}/projects").json()
+            for project in projects.get("projects"):
+                if project["name"].startswith(name):
+                    repo = g.get_repo(name)
+                    apply_tag_to_project(
+                            client=client, org_id=org_id, project_id=project["id"], tag=repo.owner.login, key="Owner", project_name=project["name"]
+                        )
+
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
 
 @app.command(help=f"Apply a custom tag to a project collection\n\n Use the name you see in the collection as the name: name={repoexample} to tag everything under that repo or CLI import")
 def tag(org_id: str = typer.Option(
             ..., # Default value of comamand
             envvar=["ORG_ID"],
-            help="Specify one or more Organization ID where you want to apply the tag"
+            help="Specify the Organization ID where you want to apply the tag"
         ),  token: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  collectionName: str = typer.Option(
             ..., # Default value of comamand
@@ -77,3 +88,24 @@ def tag(org_id: str = typer.Option(
     ):
     typer.secho(f"\nAdding the tag key {tagKey} and tag value {tagValue} to projects within {collectionName} for easy filtering via the UI", bold=True)
     apply_tags_to_projects(token,[org_id], collectionName, tagValue, tagKey)
+
+@app.command(help=f"Add the GitHub code owner as a tag to the specified repo in Snyk, for example {repoexample}")
+def github(org_id: str = typer.Option(
+            ..., # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify the Organization ID where you want to apply the tag"
+        ),  snyktoken: str = typer.Option(
+            ..., # Default value of comamand
+            help="Snyk API token with org admin access",
+            envvar=["SNYK_TOKEN"]
+        ),  repoName: str = typer.Option(
+            ..., # Default value of comamand
+            help=f"Name of the repo, for example {repoexample}"
+        ),  githubtoken: str = typer.Option(
+            ..., # Default value of comamand
+            help="GitHub Personal Access Token with access to the repository",
+            envvar=["GITHUB_TOKEN"]
+        )
+    ):
+    typer.secho(f"\nAdding the Owner tag to projects within {repoName} for easy filtering via the UI", bold=True)
+    apply_github_owner_to_repo(snyktoken,[org_id], repoName, githubtoken)

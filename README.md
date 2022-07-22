@@ -87,7 +87,7 @@ I want to add attributes to all projects within my ```snyk-labs/python-goof``` r
 snyk-tags attribute collection  --collectionname=snyk-labs/python-goof --org-id=abc --token=abc --criticality=critical --environment=backend --lifecycle=production
 ```
 
-I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```Owner:EricFernandezSnyk```
+I want mark with the repo owner all projects of the repo ```snyk-labs/nodejs-goof``` so I can filter by owner e.g.```Owner:EricFernandezSnyk```
 
 ``` bash
 snyk-tags collection github --reponame=snyk-labs/nodejs-goof --org-id=abc --snyktoken=abc --githubtoken=abc

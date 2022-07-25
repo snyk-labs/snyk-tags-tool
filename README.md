@@ -1,10 +1,11 @@
 # Snyk Tags Tool
 
-Snyk Tags is a CLI tool with three purposes:
+Snyk Tags is a CLI tool with four purposes:
 
 - Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization - using ```snyk-tags tag```
-- Help filter Snyk projects by applying tags to a collection of projects (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags collection```
-- Help filter Snyk projects by applying attributes to a collection of projects (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags attribute```
+- Help filter Snyk projects by applying tags to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target tag```
+- Help filter Snyk projects by applying attributes to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target attributes```
+- Help filter Snyk projects by adding the GitHub Code Owner as a tag to target import (must be a GitHub repo in the form **snyk-labs/nodejs-goof**) - using ```snyk-tags target github```
 
 ### snyk-tags tag
 
@@ -14,25 +15,21 @@ Snyk Tags is a CLI tool with three purposes:
 
 You can also specify a custom tag for the specific project types.
 
-### snyk-tags collection
-
-```snyk-tags collection``` uses the Snyk Project Tag API to assign tags to all projects within a collection. A collection encompasses one or more projects in Snyk, for example:
-
-- **snyk-labs/nodejs-goof** is a collection from a git import
-- **library/httpd** is a collection from a container import
-- **/snyk-labs/nodejs-goof** is a collection from a CLI import
-
-You can also use ```snyk-tags collection``` to add your Github repository code owner as a tag to an imported repo with  ```snyk-tags collection github```
-
 [List all project types](#list-of-all-project-types)
 
-### snyk-tags attribute
+### snyk-tags target
 
-```snyk-tags attribute``` uses the Snyk Project Attribute API to assign attributes to all projects within a collection. A collection encompasses one or more projects in Snyk, for example:
+```snyk-tags target``` goes through a target (repo, container, CLI import) to assign tags, attributes and assign the GitHub code owner. Targets in snyk can be varied like:
 
-- **snyk-labs/nodejs-goof** is a collection from a git import
-- **library/httpd** is a collection from a container import
-- **/snyk-labs/nodejs-goof** is a collection from a CLI import
+- **snyk-labs/nodejs-goof** is the target from a git import
+- **library/httpd** is the target from a container import
+- **/snyk-labs/nodejs-goof** is the target from a CLI import
+
+You can use:
+
+- **```snyk-tags import tag```** to add tags to a target
+- **```snyk-tags import attributes```** to add attributes to a target
+- **```snyk-tags import github```** to add the GitHub Code Owner as a tag to a target. The GitHub repo must include the GitHub Organization e.g. **snyk-labs/nodejs-goof**
 
 [List all possible attributes](#list-of-all-attributes)
 
@@ -78,19 +75,19 @@ snyk-tags tag sca --scatype=npm --org-id=abc --token=abc
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```project:snyk```
 
 ``` bash
-snyk-tags collection tag --collectionname=snyk-labs/nodejs-goof --org-id=abc --token=abc --tagkey=project --tagvalue=snyk
+snyk-tags target tag --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --tagkey=project --tagvalue=snyk
 ```
 
 I want to add attributes to all projects within my ```snyk-labs/python-goof``` repo. The attributes are ```critical, production, backend```
 
 ``` bash
-snyk-tags attribute collection  --collectionname=snyk-labs/python-goof --org-id=abc --token=abc --criticality=critical --environment=backend --lifecycle=production
+snyk-tags import attributes  --target=snyk-labs/python-goof --org-id=abc --snytkn=abc --criticality=critical --environment=backend --lifecycle=production
 ```
 
 I want mark with the repo owner all projects of the repo ```snyk-labs/nodejs-goof``` so I can filter by owner e.g.```Owner:EricFernandezSnyk```
 
 ``` bash
-snyk-tags collection github --reponame=snyk-labs/nodejs-goof --org-id=abc --snyktoken=abc --githubtoken=abc
+snyk-tags import github --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --githubtkn=abc
 ```
 
 ## Types of projects and attributes

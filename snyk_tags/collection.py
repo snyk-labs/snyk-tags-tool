@@ -5,7 +5,7 @@ import httpx
 import typer
 from github import Github
 
-from snyk_tags import __app_name__, __version__
+from snyk_tags import __app_name__, __version__, attribute
 
 logging.basicConfig(
     level=logging.INFO,
@@ -71,11 +71,11 @@ def tag(org_id: str = typer.Option(
             ..., # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify the Organization ID where you want to apply the tag"
-        ),  token: str = typer.Option(
+        ),  snyktkn: str = typer.Option(
             ..., # Default value of comamand
             help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
-        ),  collectionName: str = typer.Option(
+        ),  target: str = typer.Option(
             ..., # Default value of comamand
             help=f"Name of the project collection, for example {repoexample}"
         ),  tagKey: str = typer.Option(
@@ -86,26 +86,60 @@ def tag(org_id: str = typer.Option(
             help="Tag value: value of the tag"
         )
     ):
-    typer.secho(f"\nAdding the tag key {tagKey} and tag value {tagValue} to projects within {collectionName} for easy filtering via the UI", bold=True)
-    apply_tags_to_projects(token,[org_id], collectionName, tagValue, tagKey)
+    typer.secho(f"\nAdding the tag key {tagKey} and tag value {tagValue} to projects within {target} for easy filtering via the UI", bold=True)
+    apply_tags_to_projects(snyktkn,[org_id], target, tagValue, tagKey)
 
+# GitHub Code Owner Tagging
 @app.command(help=f"Add the GitHub code owner as a tag to the specified repo in Snyk, for example {repoexample}")
 def github(org_id: str = typer.Option(
             ..., # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify the Organization ID where you want to apply the tag"
-        ),  snyktoken: str = typer.Option(
+        ),  snyktkn: str = typer.Option(
             ..., # Default value of comamand
             help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
-        ),  repoName: str = typer.Option(
+        ),  target: str = typer.Option(
             ..., # Default value of comamand
             help=f"Name of the repo, for example {repoexample}"
-        ),  githubtoken: str = typer.Option(
+        ),  githubtkn: str = typer.Option(
             ..., # Default value of comamand
             help="GitHub Personal Access Token with access to the repository",
             envvar=["GITHUB_TOKEN"]
         )
     ):
-    typer.secho(f"\nAdding the Owner tag to projects within {repoName} for easy filtering via the UI", bold=True)
-    apply_github_owner_to_repo(snyktoken,[org_id], repoName, githubtoken)
+    typer.secho(f"\nAdding the Owner tag to projects within {target} for easy filtering via the UI", bold=True)
+    apply_github_owner_to_repo(snyktkn,[org_id], target, githubtkn)
+
+# Coloured variables for output
+repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
+crit = typer.style("critical, high, medium, low", bold=True, fg=typer.colors.MAGENTA)
+enviro = typer.style("frontend, backend, internal, 	external, mobile, saas, onprem, hosted, distributed", bold=True, fg=typer.colors.MAGENTA)
+life = typer.style("production, development, sandbox", bold=True, fg=typer.colors.MAGENTA)
+
+# Collection command to apply the attributes to the collection
+@app.command(help=f"Apply attributes to a target, for example {repoexample}")
+def attributes(org_id: str = typer.Option(
+            ..., # Default value of comamand
+            envvar=["ORG_ID"],
+            help="Specify the Organization ID where you want to apply the attributes"
+        ),  snyktkn: str = typer.Option(
+            ..., # Default value of comamand
+            help="Snyk API token with org admin access",
+            envvar=["SNYK_TOKEN"]
+        ),  target: str = typer.Option(
+            ..., # Default value of comamand
+            help=f"Name of the project collection, for example {repoexample}"
+        ),  criticality: str = typer.Option(
+            ..., # Default value of comamand
+            help=f"Criticality attribute: {crit}"
+        ),  environment: str = typer.Option(
+            ..., # Default value of comamand
+            help=f"Environment attribute: {enviro}"
+        ),  lifecycle: str = typer.Option(
+            ..., # Default value of comamand
+            help=f"Lifecycle attribute: {life}"
+        )
+    ):
+    typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
+    attribute.apply_attributes_to_projects(snyktkn,[org_id], target, [criticality], [environment], [lifecycle])

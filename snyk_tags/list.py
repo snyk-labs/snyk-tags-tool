@@ -8,41 +8,40 @@ from snyk_tags import __app_name__, __version__
 app = typer.Typer()
 console = Console()
 '''
-List all the different project types for Snyk Products and attribute types
+List all the different project types and attribute types
 '''
 
-# SAST Command
-@app.command(help="List all Snyk Code project types")
-def sast():
-    snykcmd = typer.style("snyk-tags apply sast", bold=True, fg=typer.colors.MAGENTA)
-    typer.echo(f"These are all the Snyk Code project types you can use with {snykcmd}")
-    typer.echo("\n sast")
+# List all project types command
+@app.command(help="List all Snyk project types")
+def types():
+    snykcmd = typer.style("snyk-tags target tag or snyk-tags tag custom", bold=True, fg=typer.colors.MAGENTA)
+    typer.echo(f"These are all the attribute types you can apply with {snykcmd}")
+    table = Table("Snyk IaC", "Snyk Open Source", "Snyk Container", "Snyk Code")
+    table.add_row("terraformconfig", "maven", "dockerfile", "sast")
+    table.add_row("dockerfile", "npm", "apk", "")
+    table.add_row("terraformplan", "nuget", "deb", "")
+    table.add_row("k8sconfig", "gradle", "rpm", "")
+    table.add_row("helmconfig", "pip", "linux", "")
+    table.add_row("cloudformationconfig", "yarn", "", "")
+    table.add_row("armconfig", "gomodules", "", "")
+    table.add_row("", "rubygems", "", "")
+    table.add_row("", "composer", "", "")
+    table.add_row("", "sbt", "", "")
+    table.add_row("", "golangdep", "", "")
+    table.add_row("", "cocoapods", "", "")
+    table.add_row("", "poetry", "", "")
+    table.add_row("", "govendor", "", "")
+    table.add_row("", "cpp", "", "")
+    table.add_row("", "yarn-workspace", "", "")
+    table.add_row("", "hex", "", "")
+    table.add_row("", "paket", "", "")
+    table.add_row("", "golang", "", "")
+    console.print(table)
 
-# Container Command
-@app.command(help="List all Snyk Container project types")
-def container():
-    snykcmd = typer.style("snyk-tags apply container", bold=True, fg=typer.colors.MAGENTA)
-    typer.echo(f"These are all the Snyk Container project types you can use with {snykcmd}")
-    typer.echo("\n dockerfile\n apk\n deb\n rpm\n linux")
-
-# IaC Command
-@app.command(help="List all Snyk IaC project types")
-def iac():
-    snykcmd = typer.style("snyk-tags apply iac", bold=True, fg=typer.colors.MAGENTA)
-    typer.echo(f"These are all the Snyk IaC project types you can use with {snykcmd}")
-    typer.echo("\n terraformconfig\n terraformplan\n k8sconfig\n helmconfig\n cloudformationconfig\n armconfig")
-
-# SCA Command
-@app.command(help="List all Snyk Open Source project types")
-def sca():
-    snykcmd = typer.style("snyk-tags apply sca", bold=True, fg=typer.colors.MAGENTA)
-    typer.echo(f"These are all the Snyk Open Source project types you can use with {snykcmd}")
-    typer.echo("\n maven\n npm\n nuget\n gradle\n pip\n yarn\n gomodules\n rubygems\n composer\n sbt\n golangdep\n cocoapods\n poetry\n govendor\n cpp\n yarn-workspace\n hex\n paket\n golang")
-
-# IaC Command
-@app.command(help="List all attribute types")
+# List Attributes Command
+@app.command(help="List all Snyk attribute")
 def attributes():
-    snykcmd = typer.style("snyk-tags attribute collection", bold=True, fg=typer.colors.MAGENTA)
+    snykcmd = typer.style("snyk-tags target attributes", bold=True, fg=typer.colors.MAGENTA)
     typer.echo(f"These are all the attribute types you can apply with {snykcmd}")
     table = Table("Criticality", "Environment", "Lifecycle")
     table.add_row("critical", "frontend", "production")

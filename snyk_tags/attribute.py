@@ -21,7 +21,7 @@ def create_client(token: str) -> httpx.Client:
         base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}", 'Content-Type': 'application/json'} 
     )
 
-# Apply tags to a specific project
+# Apply attributes to a specific project
 def apply_attributes_to_project(
     client: httpx.Client, org_id: str, project_id: str, criticality: list, environment: list, lifecycle: list, project_name: str
 ) -> tuple:
@@ -46,7 +46,7 @@ def apply_attributes_to_project(
     
     return req.status_code, req.json()
 
-#
+# Apply attributes to projects within a collection
 def apply_attributes_to_projects(token: str, org_ids: list, name: str, criticality: list, environment: list, lifecycle: list) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
@@ -56,36 +56,3 @@ def apply_attributes_to_projects(token: str, org_ids: list, name: str, criticali
                     apply_attributes_to_project(
                             client=client, org_id=org_id, project_id=project["id"], criticality=criticality, environment=environment, lifecycle=lifecycle, project_name=project["name"]
                         )
-
-# Coloured variables for output
-repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
-crit = typer.style("critical, high, medium, low", bold=True, fg=typer.colors.MAGENTA)
-enviro = typer.style("frontend, backend, internal, 	external, mobile, saas, onprem, hosted, distributed", bold=True, fg=typer.colors.MAGENTA)
-life = typer.style("production, development, sandbox", bold=True, fg=typer.colors.MAGENTA)
-
-# Collection command to apply the attributes to the collection
-@app.command(help=f"Apply attributes to a project collection\n\n Use the name you see in the collection as the name: name={repoexample} to set the attributes for everything under that repo, container or CLI import")
-def collection(org_id: str = typer.Option(
-            ..., # Default value of comamand
-            envvar=["ORG_ID"],
-            help="Specify the Organization ID where you want to apply the attributes"
-        ),  token: str = typer.Option(
-            ..., # Default value of comamand
-            help="SNYK API token",
-            envvar=["SNYK_TOKEN"]
-        ),  collectionName: str = typer.Option(
-            ..., # Default value of comamand
-            help=f"Name of the project collection, for example {repoexample}"
-        ),  criticality: str = typer.Option(
-            ..., # Default value of comamand
-            help=f"Criticality attribute: {crit}"
-        ),  environment: str = typer.Option(
-            ..., # Default value of comamand
-            help=f"Environment attribute: {enviro}"
-        ),  lifecycle: str = typer.Option(
-            ..., # Default value of comamand
-            help=f"Lifecycle attribute: {life}"
-        )
-    ):
-    typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {collectionName} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
-    apply_attributes_to_projects(token,[org_id], collectionName, [criticality], [environment], [lifecycle])

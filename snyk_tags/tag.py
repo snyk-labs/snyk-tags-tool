@@ -77,9 +77,9 @@ def sast(group_id: str = typer.Option(
             "", # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify one Organization ID to only apply the tag to one organization"
-        ), token: str = typer.Option(
+        ), snyktkn: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  sastType: str = typer.Option(
             "", # Default value of comamand
@@ -93,24 +93,24 @@ def sast(group_id: str = typer.Option(
         if sastType == '' or None:
             sastType = ["sast"]
             typer.secho(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, sastType, tag='Code', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, sastType, tag='Code', key='Product')
         else:
             type.append(sastType)
             typer.secho(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, type, tag='Code', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, type, tag='Code', key='Product')
     else:
         if sastType == '' or None:
             sastType = ["sast"]
             typer.secho(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, sastType, tag='Code', key='Product')
+            apply_tags_to_projects(snyktkn, org, sastType, tag='Code', key='Product')
         else:
             type.append(sastType)
             typer.secho(f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org_ids, type, tag='Code', key='Product')
+            apply_tags_to_projects(snyktkn, org_ids, type, tag='Code', key='Product')
 
 
 
@@ -125,9 +125,9 @@ def iac(group_id: str = typer.Option(
             "", # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify one Organization ID to only apply the tag to one organization"
-        ), token: str = typer.Option(
+        ), snyktkn: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  iacType: str = typer.Option(
             "", # Default value of comamand
@@ -141,24 +141,24 @@ def iac(group_id: str = typer.Option(
         if iacType == '' or None:
             iacType=["terraformconfig", "terraformplan", "k8sconfig", "helmconfig", "cloudformationconfig", "armconfig"]
             typer.secho(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, iacType, tag='IaC', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, iacType, tag='IaC', key='Product')
         else:
             type.append(iacType)
             typer.secho(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org, type, tag='IaC', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org, type, tag='IaC', key='Product')
     else:
         if iacType == '' or None:
             iacType=["terraformconfig", "terraformplan", "k8sconfig", "helmconfig", "cloudformationconfig", "armconfig"]
             typer.secho(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, iacType, tag='IaC', key='Product')
+            apply_tags_to_projects(snyktkn, org, iacType, tag='IaC', key='Product')
         else:
             type.append(iacType)
             typer.secho(f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, type, tag='IaC', key='Product')
+            apply_tags_to_projects(snyktkn, org, type, tag='IaC', key='Product')
 
 
 
@@ -173,9 +173,9 @@ def sca(group_id: str = typer.Option(
             "", # Default value of comamand,
             envvar=["ORG_ID"],
             help="Specify one Organization ID to only apply the tag to one organization"
-        ),  token: str = typer.Option(
+        ),  snyktkn: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  scaType: str = typer.Option(
             "", # Default value of comamand
@@ -189,24 +189,24 @@ def sca(group_id: str = typer.Option(
         if scaType == '' or None:
             scaType = ["maven","npm","nuget", "gradle", "pip", "yarn", "gomodules", "rubygems", "composer", "sbt", "golangdep", "cocoapods", "poetry", "govendor", "cpp", "yarn-workspace", "hex", "paket", "golang"]
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, scaType, tag='Open Source', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, scaType, tag='Open Source', key='Product')
         else:
             type.append(scaType)
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, type, tag='Open Source', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, type, tag='Open Source', key='Product')
     else:
         if scaType == '' or None:
             scaType = ["maven","npm","nuget", "gradle", "pip", "yarn", "gomodules", "rubygems", "composer", "sbt", "golangdep", "cocoapods", "poetry", "govendor", "cpp", "yarn-workspace", "hex", "paket", "golang"]
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, scaType, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org, scaType, tag='Open Source', key='Product')
         else:
             type.append(scaType)
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, type, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org, type, tag='Open Source', key='Product')
 
 
 
@@ -221,9 +221,9 @@ def container(group_id: str = typer.Option(
             "", # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify one Organization ID to only apply the tag to one organization"
-        ),  token: str = typer.Option(
+        ),  snyktkn: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  containerType: str = typer.Option(
             "", # Default value of comamand
@@ -237,24 +237,24 @@ def container(group_id: str = typer.Option(
         if containerType == '' or None:
             containerType= ["dockerfile", "apk", "deb", "rpm", "linux"]
             typer.secho(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, containerType, tag='Container', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, containerType, tag='Container', key='Product')
         else:
             type.append(containerType)
             typer.secho(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI", bold=True)
-            org_ids = get_org_ids(token, group_id)
-            apply_tags_to_projects(token, org_ids, type, tag='Container', key='Product')
+            org_ids = get_org_ids(snyktkn, group_id)
+            apply_tags_to_projects(snyktkn, org_ids, type, tag='Container', key='Product')
     else:
         if containerType == '' or None:
             containerType= ["dockerfile", "apk", "deb", "rpm", "linux"]
             typer.secho(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, containerType, tag='Container', key='Product')
+            apply_tags_to_projects(snyktkn, org, containerType, tag='Container', key='Product')
         else:
             type.append(containerType)
             typer.secho(f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(token, org, type, tag='Container', key='Product')
+            apply_tags_to_projects(snyktkn, org, type, tag='Container', key='Product')
 
 # Custom Command
 @app.command(help="Apply custom tags to the preferred project type")
@@ -266,9 +266,9 @@ def custom(group_id: str = typer.Option(
             "", # Default value of comamand
             envvar=["ORG_ID"],
             help="Specify one Organization ID to only apply the tag to one organization"
-        ),  token: str = typer.Option(
+        ),  snyktkn: str = typer.Option(
             ..., # Default value of comamand
-            help="SNYK API token",
+            help="Snyk API token with org admin access",
             envvar=["SNYK_TOKEN"]
         ),  projectType: str = typer.Option(
             ..., # Default value of comamand
@@ -287,9 +287,9 @@ def custom(group_id: str = typer.Option(
     type =[]
     type.append(projectType)
     if org_id == '' or None:
-        org_ids = get_org_ids(token, group_id)
-        apply_tags_to_projects(token, org_ids, type, tagValue, tagKey)
+        org_ids = get_org_ids(snyktkn, group_id)
+        apply_tags_to_projects(snyktkn, org_ids, type, tagValue, tagKey)
     else:
         org.append(org_id)
-        apply_tags_to_projects(token, org, type, tagValue, tagKey)
+        apply_tags_to_projects(snyktkn, org, type, tagValue, tagKey)
 

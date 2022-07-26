@@ -190,23 +190,23 @@ def sca(group_id: str = typer.Option(
             scaType = ["maven","npm","nuget", "gradle", "pip", "yarn", "gomodules", "rubygems", "composer", "sbt", "golangdep", "cocoapods", "poetry", "govendor", "cpp", "yarn-workspace", "hex", "paket", "golang"]
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(snyktkn, org_ids, scaType, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org_ids, scaType, tag='OpenSource', key='Product')
         else:
             type.append(scaType)
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(snyktkn, org_ids, type, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org_ids, type, tag='OpenSource', key='Product')
     else:
         if scaType == '' or None:
             scaType = ["maven","npm","nuget", "gradle", "pip", "yarn", "gomodules", "rubygems", "composer", "sbt", "golangdep", "cocoapods", "poetry", "govendor", "cpp", "yarn-workspace", "hex", "paket", "golang"]
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, scaType, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org, scaType, tag='OpenSource', key='Product')
         else:
             type.append(scaType)
             typer.secho(f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI", bold=True)
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, type, tag='Open Source', key='Product')
+            apply_tags_to_projects(snyktkn, org, type, tag='OpenSource', key='Product')
 
 
 

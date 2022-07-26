@@ -63,13 +63,13 @@ python -m snyk-tags # To run snyk-tags
 I want to filter all my Snyk Code projects to the whole Snyk Group:
 
 ``` bash
-snyk-tags tag sast --group-id=abc --token=abc
+snyk-tags tag sast --group-id=abc --snyktkn=abc
 ```
 
 I want to filter all my ```npm``` Snyk Open Source projects within a specific Snyk Organization:
 
 ``` bash
-snyk-tags tag sca --scatype=npm --org-id=abc --token=abc
+snyk-tags tag sca --scatype=npm --org-id=abc --snyktkn=abc
 ```
 
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```project:snyk```

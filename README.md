@@ -1,11 +1,12 @@
 # Snyk Tags Tool
 
-Snyk Tags is a CLI tool with four purposes:
+Snyk Tags is a CLI tool which can:
 
 - Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization - using ```snyk-tags tag```
 - Help filter Snyk projects by applying tags to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target tag```
 - Help filter Snyk projects by applying attributes to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target attributes```
 - Help filter Snyk projects by adding the GitHub Code Owner as a tag to target import (must be a GitHub repo in the form **snyk-labs/nodejs-goof**) - using ```snyk-tags target github```
+- Help with tag management by removing tags from a Group or a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target remove``` or listing all tags using ```snyk-tags list tags```
 
 ### snyk-tags tag
 
@@ -27,9 +28,9 @@ You can also specify a custom tag for the specific project types.
 
 You can use:
 
-- **```snyk-tags import tag```** to add tags to a target
-- **```snyk-tags import attributes```** to add attributes to a target
-- **```snyk-tags import github```** to add the GitHub Code Owner as a tag to a target. The GitHub repo must include the GitHub Organization e.g. **snyk-labs/nodejs-goof**
+- **```snyk-tags target tag```** to add tags to a target
+- **```snyk-tags target attributes```** to add attributes to a target
+- **```snyk-tags target github```** to add the GitHub Code Owner as a tag to a target. The GitHub repo must include the GitHub Organization e.g. **snyk-labs/nodejs-goof**
 
 [List all possible attributes](#list-of-all-attributes)
 
@@ -81,13 +82,19 @@ snyk-tags target tag --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc -
 I want to add attributes to all projects within my ```snyk-labs/python-goof``` repo. The attributes are ```critical, production, backend```
 
 ``` bash
-snyk-tags import attributes  --target=snyk-labs/python-goof --org-id=abc --snytkn=abc --criticality=critical --environment=backend --lifecycle=production
+snyk-tags target attributes  --target=snyk-labs/python-goof --org-id=abc --snytkn=abc --criticality=critical --environment=backend --lifecycle=production
 ```
 
 I want mark with the repo owner all projects of the repo ```snyk-labs/nodejs-goof``` so I can filter by owner e.g.```Owner:EricFernandezSnyk```
 
 ``` bash
-snyk-tags import github --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --githubtkn=abc
+snyk-tags target github --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --githubtkn=abc
+```
+
+I want to remove the tag project:snyk from the repo ```snyk-labs/nodejs-goof```
+
+``` bash
+snyk-tags remove tag-from-target --target=snyk-labs/nodejs-goof --group-id=abc --snyktkn=abc --tagkey=project --tagkey=snyk
 ```
 
 ## Types of projects and attributes

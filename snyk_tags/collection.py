@@ -35,7 +35,7 @@ def apply_tag_to_project(
     if req.status_code == 200:
         logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
     if req.status_code == 422:
-        logging.warning(f"{tag_data} tag is already applied for Project: {project_name}.")
+        logging.warning(f"{tag_data} tag is already applied for Project: {project_name}. Error message: {req.json()}.")
     if req.status_code == 404:
         logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
     return req.status_code, req.json()
@@ -64,9 +64,13 @@ def apply_github_owner_to_repo(snyktoken: str, org_ids: list, name: str, githubt
                             client=client, org_id=org_id, project_id=project["id"], tag=repo.owner.login, key="Owner", project_name=project["name"]
                         )
 
+# Coloured variables for output
+crit = typer.style("critical, high, medium, low", bold=True, fg=typer.colors.MAGENTA)
+enviro = typer.style("frontend, backend, internal, 	external, mobile, saas, onprem, hosted, distributed", bold=True, fg=typer.colors.MAGENTA)
+life = typer.style("production, development, sandbox", bold=True, fg=typer.colors.MAGENTA)
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
 
-@app.command(help=f"Apply a custom tag to a project collection\n\n Use the name you see in the collection as the name: name={repoexample} to tag everything under that repo or CLI import")
+@app.command(help=f"Apply a custom tag to a target, for example {repoexample}")
 def tag(org_id: str = typer.Option(
             ..., # Default value of comamand
             envvar=["ORG_ID"],
@@ -77,7 +81,7 @@ def tag(org_id: str = typer.Option(
             envvar=["SNYK_TOKEN"]
         ),  target: str = typer.Option(
             ..., # Default value of comamand
-            help=f"Name of the project collection, for example {repoexample}"
+            help=f"Name of the target, for example {repoexample}"
         ),  tagKey: str = typer.Option(
             ..., # Default value of comamand
             help="Tag key: identifier of the tag"
@@ -110,12 +114,6 @@ def github(org_id: str = typer.Option(
     ):
     typer.secho(f"\nAdding the Owner tag to projects within {target} for easy filtering via the UI", bold=True)
     apply_github_owner_to_repo(snyktkn,[org_id], target, githubtkn)
-
-# Coloured variables for output
-repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
-crit = typer.style("critical, high, medium, low", bold=True, fg=typer.colors.MAGENTA)
-enviro = typer.style("frontend, backend, internal, 	external, mobile, saas, onprem, hosted, distributed", bold=True, fg=typer.colors.MAGENTA)
-life = typer.style("production, development, sandbox", bold=True, fg=typer.colors.MAGENTA)
 
 # Collection command to apply the attributes to the collection
 @app.command(help=f"Apply attributes to a target, for example {repoexample}")

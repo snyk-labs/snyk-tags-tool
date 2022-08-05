@@ -1,7 +1,11 @@
 #! /usr/bin/env python3
+from matplotlib.font_manager import json_dump
+from rich import print_json
 import typer
 from rich.console import Console
 from rich.table import Table
+import json
+import httpx
 
 from snyk_tags import __app_name__, __version__
 
@@ -54,3 +58,48 @@ def attributes():
     table.add_row("", "hosted", "")
     table.add_row("", "distributed", "")
     console.print(table)
+
+# Functions for tags listing command
+def create_client(token: str) -> httpx.Client:
+        return httpx.Client(
+            base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
+        )
+
+# Get the tags from a group
+def find_tags(
+    token: str, group_id: str, jsonflag: bool
+) -> tuple:
+    with create_client(token=token) as client:
+        req = client.get(f"group/{group_id}/tags")
+        group = client.get(f"group/{group_id}/orgs").json()
+        group_name = group["name"]
+        if req.status_code == 200:
+            if jsonflag is False:
+                print(f"These are the tags in Group: {group_name}")
+                table = Table("Key", "Value")
+                for tags in req.json().get("tags"):
+                    key = tags.get("key")
+                    value = tags.get("value")
+                    table.add_row(key ,value )
+                console.print(table)
+            elif jsonflag is True:
+                print(json.dumps(req.json()))
+        if req.status_code == 404:
+            print(f"Group {group_name} not found. Error message: {req.json()}.")
+        return req.status_code, req.json()
+
+# List existing tags in a Group Command
+@app.command(help="List all existing tags in a Group")
+def tags(group_id: str = typer.Option(
+            ..., # Default value of comamand
+            envvar=["GROUP_ID"],
+            help="Specify the Group you want to see the tags from"
+        ),  snyktkn: str = typer.Option(
+            ..., # Default value of comamand
+            help="Snyk API token with Group admin access",
+            envvar=["SNYK_TOKEN"]
+        ),  json: bool = typer.Option(
+            False, "--json", # Default value of comamand
+            help=f"Output into json format (default is a table), use --json to change output.",
+        )):
+    find_tags(snyktkn, group_id, json)

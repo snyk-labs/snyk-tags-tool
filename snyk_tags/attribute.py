@@ -38,11 +38,11 @@ def apply_attributes_to_project(
         logging.info(f"Successfully added {attribute_data} attributes to Project: {project_name}.")
     
     if req.status_code == 422:
-        logging.warning(f"Data {attribute_data} cannot be processed, make sure you have written the correct values (refer to help or Readme) and that they are in low caps.")
+        logging.warning(f"Data {attribute_data} cannot be processed, make sure you have written the correct values (refer to help or Readme) and that they are in low caps. Error message: {req.json()}.")
     if req.status_code == 404:
         logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
     if req.status_code == 500:
-        logging.error(f"Error {req.status_code}: Internal Server Error. Please contact eric.fernandez@snyk.io.")
+        logging.error(f"Error message: {req.json()}.. Please contact eric.fernandez@snyk.io.")
     
     return req.status_code, req.json()
 

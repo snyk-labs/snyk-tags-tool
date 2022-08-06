@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "snyk-tags"
-version = "0.9.0"
-description = "Tool designed to add tags in bulk to Snyk projects"
+version = "0.9.1"
+description = "CLI tool designed to manage tags and attributes at scale"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/EricFernandezSnyk/snyk-tags-tool"
+repository = "https://github.com/snyk-labs/snyk-tags-tool"
 keywords =["snyk"]
 
 [tool.poetry.scripts]

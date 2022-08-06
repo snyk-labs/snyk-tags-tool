@@ -29,6 +29,7 @@ def target_tag(file: List[Path] = typer.Option(...,help=f".csv or .json file wit
                     value = row.get("value")
                     typer.secho(f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI", bold=True)
                     collection.apply_tags_to_projects(snyktkn, [org_id], target, value, key)
+                openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
                 for row in jsonreader:
@@ -38,8 +39,10 @@ def target_tag(file: List[Path] = typer.Option(...,help=f".csv or .json file wit
                     value = row.get("value")
                     typer.secho(f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI", bold=True)
                     collection.apply_tags_to_projects(snyktkn, [org_id], target, value, key)
+                openfile.close()
             else:
                 print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                openfile.close()
         else:
             print(f"The file or path does not exist")
 
@@ -59,6 +62,7 @@ def target_attributes(file: List[Path] = typer.Option(...,help=f".csv or .json f
                     lifecycle = row.get("lifecycle")
                     typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
                     attribute.apply_attributes_to_projects(snyktkn, [org_id], target, [criticality], [environment], [lifecycle])
+                openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
                 for row in jsonreader:
@@ -69,8 +73,10 @@ def target_attributes(file: List[Path] = typer.Option(...,help=f".csv or .json f
                     lifecycle = row.get("lifecycle")
                     typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
                     attribute.apply_attributes_to_projects(snyktkn, [org_id], target, [criticality], [environment], [lifecycle])
+                openfile.close()
             else:
                 print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                openfile.close()
         else:
             print(f"The file or path does not exist")
 
@@ -89,6 +95,7 @@ def remove_tag_from_group(file: List[Path] = typer.Option(...,help=f".csv or .js
                     tagValue = row.get("value")
                     typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)
                     remove.remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey)
+                openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
                 for row in jsonreader:
@@ -96,8 +103,10 @@ def remove_tag_from_group(file: List[Path] = typer.Option(...,help=f".csv or .js
                     tagValue = row.get("value")
                     typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)
                     remove.remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey)
+                openfile.close()
             else:
                 print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                openfile.close()
         else:
             print(f"The file or path does not exist")
 
@@ -116,6 +125,7 @@ def remove_tag_from_target(file: List[Path] = typer.Option(...,help=f".csv or .j
                     value = row.get("value")
                     typer.secho(f"\nRemoving {key}:{value} from projects within {target}", bold=True)
                     remove.remove_tags_from_projects(snyktkn,org_id, target, value, key)
+                openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
                 for row in jsonreader:
@@ -125,7 +135,9 @@ def remove_tag_from_target(file: List[Path] = typer.Option(...,help=f".csv or .j
                     value = row.get("value")
                     typer.secho(f"\nRemoving {key}:{value} from projects within {target}", bold=True)
                     remove.remove_tags_from_projects(snyktkn,org_id, target, value, key)
+                openfile.close()
             else:
                 print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                openfile.close()
         else:
             print(f"The file or path does not exist")

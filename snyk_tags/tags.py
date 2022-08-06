@@ -12,7 +12,7 @@ snykcmd3 = typer.style("snyk-tags list --help", bold=True, fg=typer.colors.MAGEN
 snykcmd4 = typer.style("snyk-tags remove --help", bold=True, fg=typer.colors.MAGENTA)
 
 app = typer.Typer(
-    help=f"{snyk} helps you filter Snyk projects by adding product tags and attributes to projects per product or target of projects\n\n To start using it try running:\n\n - {snykcmd} \n\n - {snykcmd2}  \n\n - {snykcmd3}  \n\n - {snykcmd4}",
+    help=f"{snyk} helps you filter Snyk projects by adding or removing product tags and attributes to projects per product or target of projects\n\n To start using it try running:\n\n - {snykcmd} \n\n - {snykcmd2}  \n\n - {snykcmd3}  \n\n - {snykcmd4}",
     add_completion=False,
     no_args_is_help=True
     )

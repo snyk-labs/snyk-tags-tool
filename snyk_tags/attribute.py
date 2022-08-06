@@ -34,16 +34,17 @@ def apply_attributes_to_project(
     req = client.post(f"org/{org_id}/project/{project_id}/attributes", data=json.dumps(attribute_data))
     
     attribute_data = typer.style(attribute_data, bold=True, fg=typer.colors.MAGENTA)
+    criticality = typer.style(criticality, bold=True, fg=typer.colors.MAGENTA)
+    environment = typer.style(environment, bold=True, fg=typer.colors.MAGENTA)
+    lifecycle = typer.style(lifecycle, bold=True, fg=typer.colors.MAGENTA)
     if req.status_code == 200:
-        logging.info(f"Successfully added {attribute_data} attributes to Project: {project_name}.")
-    
+        logging.info(f"Successfully added {criticality},{environment},{lifecycle} attributes to Project: {project_name}.")
     if req.status_code == 422:
         logging.warning(f"Data {attribute_data} cannot be processed, make sure you have written the correct values (refer to help or Readme) and that they are in low caps. Error message: {req.json()}.")
     if req.status_code == 404:
         logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
     if req.status_code == 500:
-        logging.error(f"Error message: {req.json()}.. Please contact eric.fernandez@snyk.io.")
-    
+        logging.error(f"Error message: {req.json()}. Please contact eric.fernandez@snyk.io.")
     return req.status_code, req.json()
 
 # Apply attributes to projects within a collection

@@ -3,10 +3,10 @@
 Snyk Tags is a CLI tool which can:
 
 - Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization - using ```snyk-tags tag```
-- Help filter Snyk projects by applying tags to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target tag```
-- Help filter Snyk projects by applying attributes to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target attributes```
+- Help filter Snyk projects by applying tags to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target tag``` or from a csv/json file with ```snyk-tags fromfile target-tag```
+- Help filter Snyk projects by applying attributes to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target attributes``` or from a csv/json file with ```snyk-tags fromfile target-attributes```
 - Help filter Snyk projects by adding the GitHub Code Owner as a tag to target import (must be a GitHub repo in the form **snyk-labs/nodejs-goof**) - using ```snyk-tags target github```
-- Help with tag management by removing tags from a Group or a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target remove``` or listing all tags using ```snyk-tags list tags```
+- Help with tag management by removing tags from a Group or a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target remove``` or listing all tags using ```snyk-tags list tags``` (also in bulk or from a csv/json file with ```snyk-tags fromfile```)
 
 ### snyk-tags tag
 
@@ -95,6 +95,12 @@ I want to remove the tag project:snyk from the repo ```snyk-labs/nodejs-goof```
 
 ``` bash
 snyk-tags remove tag-from-target --target=snyk-labs/nodejs-goof --group-id=abc --snyktkn=abc --tagkey=project --tagkey=snyk
+```
+
+I want to filter all projects within ```snyk-labs/nodejs-goof``` and ```snyk-labs/goof``` repo by ```project:snyk``` so I use a csv in the format ```org-id,target,key,value```
+
+``` bash
+snyk-tags fromfile target-tag --file=path/to/file.csv --snyktkn
 ```
 
 ## Types of projects and attributes

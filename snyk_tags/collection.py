@@ -35,7 +35,7 @@ def apply_tag_to_project(
     if req.status_code == 200:
         logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
     if req.status_code == 422:
-        logging.warning(f"{tag_data} tag is already applied for Project: {project_name}. Error message: {req.json()}.")
+        logging.warning(f"Tag {key}:{tag} is already applied for Project: {project_name}.")
     if req.status_code == 404:
         logging.error(f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}.")
     return req.status_code, req.json()

@@ -1,0 +1,3 @@
+org-id,target,criticality,environment,lifecycle
+orgid,snyk-labs/snyk-goof,critical,frontend,production
+orgid,snyk-labs/goof,high,backend,sandbox

@@ -1,0 +1,14 @@
+[
+  {
+    "org-id": "orgid",
+    "target": "snyk-labs/snyk-goof",
+    "key": "test",
+    "value": "test"
+  },
+  {
+    "org-id": "orgid",
+    "target": "snyk-labs/snyk-goof",
+    "key": "test1",
+    "value": "test"
+  }
+]

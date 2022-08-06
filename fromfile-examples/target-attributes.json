@@ -1,0 +1,16 @@
+[
+  {
+    "org-id": "orgid",
+    "target": "snyk-labs/snyk-goof",
+    "criticality": "critical",
+    "environment": "frontend",
+    "lifecycle": "production"
+  },
+  {
+    "org-id": "orgid",
+    "target": "snyk-labs/goof",
+    "criticality": "high",
+    "environment": "backend",
+    "lifecycle": "sandbox"
+  }
+]

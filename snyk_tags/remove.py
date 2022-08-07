@@ -27,11 +27,16 @@ def remove_tag_from_project(
 def remove_tags_from_projects(token: str, org_id: list, name: str, tag: str, key: str) -> None:
     client = SnykClient(token=token)
     projects = client.organizations.get(org_id).projects.all()
+    isname = 0
     for project in projects:
         if project.name.startswith(name):
             remove_tag_from_project(
                     token=token, org_id=org_id, project_id=project.id, tag=tag, key=key, project_name=project.name
                 )
+        else:
+            isname=1
+    if isname == 1:
+        print(f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]")
 
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:

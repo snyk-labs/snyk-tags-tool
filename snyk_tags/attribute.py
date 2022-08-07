@@ -4,6 +4,7 @@ import logging
 import httpx
 import typer
 import json
+from rich import print
 
 from snyk_tags import __app_name__, __version__
 
@@ -52,8 +53,13 @@ def apply_attributes_to_projects(token: str, org_ids: list, name: str, criticali
     with create_client(token=token) as client:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects").json()
+            isname = 0
             for project in projects.get("projects"):
                 if project["name"].startswith(name):
                     apply_attributes_to_project(
                             client=client, org_id=org_id, project_id=project["id"], criticality=criticality, environment=environment, lifecycle=lifecycle, project_name=project["name"]
                         )
+                else:
+                    isname=1
+            if isname == 1:
+                print(f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]")

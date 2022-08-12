@@ -1,6 +1,5 @@
 # Snyk Tags Tool
 ![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
-Support will be through issues in GitHub, Snyk support will not deal with cases raised due to this tool!
 
 **Snyk Tags is a CLI tool which can:**
 

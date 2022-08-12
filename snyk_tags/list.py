@@ -1,5 +1,4 @@
 #! /usr/bin/env python3
-from matplotlib.font_manager import json_dump
 from rich import print_json
 import typer
 from rich.console import Console

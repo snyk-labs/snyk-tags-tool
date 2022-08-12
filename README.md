@@ -1,6 +1,8 @@
 # Snyk Tags Tool
+![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
+Support will be through issues in GitHub, Snyk support will not deal with cases raised due to this tool!
 
-Snyk Tags is a CLI tool which can:
+**Snyk Tags is a CLI tool which can:**
 
 - Help filter Snyk projects by product type by adding product tags across a Snyk Group or Organization - using ```snyk-tags tag```
 - Help filter Snyk projects by applying tags to a target import (for example a git repo like **snyk-labs/nodejs-goof**) - using ```snyk-tags target tag``` or from a csv/json file with ```snyk-tags fromfile target-tag```

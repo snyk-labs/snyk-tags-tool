@@ -46,15 +46,17 @@ def apply_tags_to_projects(token: str, org_ids: list, name: str, tag: str, key: 
     with create_client(token=token) as client:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects").json()
-            isname = 0
+            badname = 0
+            rightname = 0
             for project in projects.get("projects"):
                 if project["name"].startswith(name):
                     apply_tag_to_project(
                             client=client, org_id=org_id, project_id=project["id"], tag=tag, key=key, project_name=project["name"]
                         )
+                    rightname = 1
                 else:
-                    isname=1
-            if isname == 1:
+                    badname=1
+            if badname == 1 and rightname == 0:
                 print(f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]")
 
 # GitHub Tagging Loop
@@ -63,16 +65,18 @@ def apply_github_owner_to_repo(snyktoken: str, org_ids: list, name: str, githubt
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects").json()
-            isname = 0
+            badname = 0
+            rightname = 0
             for project in projects.get("projects"):
                 if project["name"].startswith(name):
                     repo = g.get_repo(name)
                     apply_tag_to_project(
                             client=client, org_id=org_id, project_id=project["id"], tag=repo.owner.login, key="Owner", project_name=project["name"]
                         )
+                    rightname = 1
                 else:
-                    isname=1
-            if isname == 1:
+                    badname=1
+            if badname == 1 and rightname == 0:
                 print(f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]")
 
 # Coloured variables for output
@@ -140,13 +144,13 @@ def attributes(org_id: str = typer.Option(
             ..., # Default value of comamand
             help=f"Name of the project collection, for example {repoexample}"
         ),  criticality: str = typer.Option(
-            ..., # Default value of comamand
+            "", # Default value of comamand
             help=f"Criticality attribute: {crit}"
         ),  environment: str = typer.Option(
-            ..., # Default value of comamand
+            "", # Default value of comamand
             help=f"Environment attribute: {enviro}"
         ),  lifecycle: str = typer.Option(
-            ..., # Default value of comamand
+            "", # Default value of comamand
             help=f"Lifecycle attribute: {life}"
         )
     ):

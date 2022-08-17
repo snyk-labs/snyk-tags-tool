@@ -12,6 +12,4 @@ from sre_constants import SUCCESS
     ERROR,
 ) = range(2)
 
-ERRORS = {
-    ERROR: "ID Error"
-}
+ERRORS = {ERROR: "ID Error"}

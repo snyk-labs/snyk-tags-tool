@@ -23,13 +23,15 @@ jobs:
       - uses: actions/setup-python@v4.0.0
         with:
           python-version: 3.8
-      - name: Test snyk-tags
+      - name: Test and lint snyk-tags
         run: |
           pip install pytest
           pip install poetry
+          pip install black
           poetry install
           pip install .
           pytest
+          black --check snyk_tags
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v1.11
         with:

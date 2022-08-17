@@ -10,14 +10,18 @@ from snyk_tags import __app_name__, __version__
 
 app = typer.Typer()
 console = Console()
-'''
+"""
 List all the different project types and attribute types
-'''
+"""
 
 # List all project types command
 @app.command(help="List all Snyk project types")
 def types():
-    snykcmd = typer.style("snyk-tags target tag or snyk-tags tag custom", bold=True, fg=typer.colors.MAGENTA)
+    snykcmd = typer.style(
+        "snyk-tags target tag or snyk-tags tag custom",
+        bold=True,
+        fg=typer.colors.MAGENTA,
+    )
     typer.echo(f"These are all the attribute types you can apply with {snykcmd}")
     table = Table("Snyk IaC", "Snyk Open Source", "Snyk Container", "Snyk Code")
     table.add_row("terraformconfig", "maven", "dockerfile", "sast")
@@ -41,10 +45,13 @@ def types():
     table.add_row("", "golang", "", "")
     console.print(table)
 
+
 # List Attributes Command
 @app.command(help="List all Snyk attribute")
 def attributes():
-    snykcmd = typer.style("snyk-tags target attributes", bold=True, fg=typer.colors.MAGENTA)
+    snykcmd = typer.style(
+        "snyk-tags target attributes", bold=True, fg=typer.colors.MAGENTA
+    )
     typer.echo(f"These are all the attribute types you can apply with {snykcmd}")
     table = Table("Criticality", "Environment", "Lifecycle")
     table.add_row("critical", "frontend", "production")
@@ -58,16 +65,16 @@ def attributes():
     table.add_row("", "distributed", "")
     console.print(table)
 
+
 # Functions for tags listing command
 def create_client(token: str) -> httpx.Client:
-        return httpx.Client(
-            base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
-        )
+    return httpx.Client(
+        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
+    )
+
 
 # Get the tags from a group
-def find_tags(
-    token: str, group_id: str, jsonflag: bool
-) -> tuple:
+def find_tags(token: str, group_id: str, jsonflag: bool) -> tuple:
     with create_client(token=token) as client:
         req = client.get(f"group/{group_id}/tags")
         group = client.get(f"group/{group_id}/orgs").json()
@@ -79,7 +86,7 @@ def find_tags(
                 for tags in req.json().get("tags"):
                     key = tags.get("key")
                     value = tags.get("value")
-                    table.add_row(key ,value )
+                    table.add_row(key, value)
                 console.print(table)
             elif jsonflag is True:
                 print(json.dumps(req.json()))
@@ -87,18 +94,24 @@ def find_tags(
             print(f"Group {group_name} not found. Error message: {req.json()}.")
         return req.status_code, req.json()
 
+
 # List existing tags in a Group Command
 @app.command(help="List all existing tags in a Group")
-def tags(group_id: str = typer.Option(
-            ..., # Default value of comamand
-            envvar=["GROUP_ID"],
-            help="Specify the Group you want to see the tags from"
-        ),  snyktkn: str = typer.Option(
-            ..., # Default value of comamand
-            help="Snyk API token with Group admin access",
-            envvar=["SNYK_TOKEN"]
-        ),  json: bool = typer.Option(
-            False, "--json", # Default value of comamand
-            help=f"Output into json format (default is a table), use --json to change output.",
-        )):
+def tags(
+    group_id: str = typer.Option(
+        ...,  # Default value of comamand
+        envvar=["GROUP_ID"],
+        help="Specify the Group you want to see the tags from",
+    ),
+    snyktkn: str = typer.Option(
+        ...,  # Default value of comamand
+        help="Snyk API token with Group admin access",
+        envvar=["SNYK_TOKEN"],
+    ),
+    json: bool = typer.Option(
+        False,
+        "--json",  # Default value of comamand
+        help=f"Output into json format (default is a table), use --json to change output.",
+    ),
+):
     find_tags(snyktkn, group_id, json)

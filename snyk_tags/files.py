@@ -10,13 +10,28 @@ import json
 app = typer.Typer()
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
 tagexample = typer.style("org-id,target,key,value", bold=True, fg=typer.colors.MAGENTA)
-attributesexample = typer.style("org-id,target,criticality,environment,lifecycle", bold=True, fg=typer.colors.MAGENTA)
+attributesexample = typer.style(
+    "org-id,target,criticality,environment,lifecycle",
+    bold=True,
+    fg=typer.colors.MAGENTA,
+)
 removetaggroupexample = typer.style("key,value", bold=True, fg=typer.colors.MAGENTA)
-removetagtargetexample = typer.style("org-id,target,key,value", bold=True, fg=typer.colors.MAGENTA)
+removetagtargetexample = typer.style(
+    "org-id,target,key,value", bold=True, fg=typer.colors.MAGENTA
+)
 
-@app.command(help=f"Apply a custom tag from a .csv or .json to a target, for example {repoexample} \n\n The .csv or .json must be in the format {tagexample}")
-def target_tag(file: List[Path] = typer.Option(...,help=f".csv or .json file with the format {tagexample}"),
-    snyktkn: str = typer.Option(...,help="Snyk API token with org admin access",envvar=["SNYK_TOKEN"])):
+
+@app.command(
+    help=f"Apply a custom tag from a .csv or .json to a target, for example {repoexample} \n\n The .csv or .json must be in the format {tagexample}"
+)
+def target_tag(
+    file: List[Path] = typer.Option(
+        ..., help=f".csv or .json file with the format {tagexample}"
+    ),
+    snyktkn: str = typer.Option(
+        ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
+    ),
+):
     for path in file:
         if path.is_file():
             openfile = open(path)
@@ -27,8 +42,13 @@ def target_tag(file: List[Path] = typer.Option(...,help=f".csv or .json file wit
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    typer.secho(f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI", bold=True)
-                    collection.apply_tags_to_projects(snyktkn, [org_id], target, value, key)
+                    typer.secho(
+                        f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
+                        bold=True,
+                    )
+                    collection.apply_tags_to_projects(
+                        snyktkn, [org_id], target, value, key
+                    )
                 openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
@@ -37,18 +57,34 @@ def target_tag(file: List[Path] = typer.Option(...,help=f".csv or .json file wit
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    typer.secho(f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI", bold=True)
-                    collection.apply_tags_to_projects(snyktkn, [org_id], target, value, key)
+                    typer.secho(
+                        f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
+                        bold=True,
+                    )
+                    collection.apply_tags_to_projects(
+                        snyktkn, [org_id], target, value, key
+                    )
                 openfile.close()
             else:
-                print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                print(
+                    f"The file {openfile.name} is not valid, it must be either a .csv or a .json"
+                )
                 openfile.close()
         else:
             print(f"The file or path does not exist")
 
-@app.command(help=f"Apply attributes from a .csv or .json to a target, for example {repoexample} \n\n The .csv or .json must be in the format {attributesexample}")
-def target_attributes(file: List[Path] = typer.Option(...,help=f".csv or .json file with the format {attributesexample}"),
-    snyktkn: str = typer.Option(...,help="Snyk API token with org admin access",envvar=["SNYK_TOKEN"])):
+
+@app.command(
+    help=f"Apply attributes from a .csv or .json to a target, for example {repoexample} \n\n The .csv or .json must be in the format {attributesexample}"
+)
+def target_attributes(
+    file: List[Path] = typer.Option(
+        ..., help=f".csv or .json file with the format {attributesexample}"
+    ),
+    snyktkn: str = typer.Option(
+        ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
+    ),
+):
     for path in file:
         if path.is_file():
             openfile = open(path)
@@ -60,8 +96,19 @@ def target_attributes(file: List[Path] = typer.Option(...,help=f".csv or .json f
                     criticality = row.get("criticality")
                     environment = row.get("environment")
                     lifecycle = row.get("lifecycle")
-                    typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
-                    attribute.apply_attributes_to_projects(snyktkn, [org_id], target, [criticality], [environment], [lifecycle])
+                    typer.secho(
+                        f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI",
+                        bold=True,
+                        fg=typer.colors.MAGENTA,
+                    )
+                    attribute.apply_attributes_to_projects(
+                        snyktkn,
+                        [org_id],
+                        target,
+                        [criticality],
+                        [environment],
+                        [lifecycle],
+                    )
                 openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
@@ -71,20 +118,50 @@ def target_attributes(file: List[Path] = typer.Option(...,help=f".csv or .json f
                     criticality = row.get("criticality")
                     environment = row.get("environment")
                     lifecycle = row.get("lifecycle")
-                    typer.secho(f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI", bold=True, fg=typer.colors.MAGENTA)
-                    attribute.apply_attributes_to_projects(snyktkn, [org_id], target, [criticality], [environment], [lifecycle])
+                    typer.secho(
+                        f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI",
+                        bold=True,
+                        fg=typer.colors.MAGENTA,
+                    )
+                    attribute.apply_attributes_to_projects(
+                        snyktkn,
+                        [org_id],
+                        target,
+                        [criticality],
+                        [environment],
+                        [lifecycle],
+                    )
                 openfile.close()
             else:
-                print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                print(
+                    f"The file {openfile.name} is not valid, it must be either a .csv or a .json"
+                )
                 openfile.close()
         else:
             print(f"The file or path does not exist")
 
-@app.command(help=f"Remove tags from a Group with .csv or .json, this can be forced through --force")
-def remove_tag_from_group(file: List[Path] = typer.Option(...,help=f".csv or .json file with the format {removetaggroupexample}"),
-    group_id: str = typer.Option(...,envvar=["GROUP_ID"],help="Specify the Group where you want to remove the tag from"),
-    snyktkn: str = typer.Option(...,help="Snyk API token with Group admin access",envvar=["SNYK_TOKEN"]),
-    force: bool = typer.Option(False, "--force",help=f"Force delete tag that has entities (default is false), use --force to turn into True.",)):
+
+@app.command(
+    help=f"Remove tags from a Group with .csv or .json, this can be forced through --force"
+)
+def remove_tag_from_group(
+    file: List[Path] = typer.Option(
+        ..., help=f".csv or .json file with the format {removetaggroupexample}"
+    ),
+    group_id: str = typer.Option(
+        ...,
+        envvar=["GROUP_ID"],
+        help="Specify the Group where you want to remove the tag from",
+    ),
+    snyktkn: str = typer.Option(
+        ..., help="Snyk API token with Group admin access", envvar=["SNYK_TOKEN"]
+    ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help=f"Force delete tag that has entities (default is false), use --force to turn into True.",
+    ),
+):
     for path in file:
         if path.is_file():
             openfile = open(path)
@@ -93,26 +170,47 @@ def remove_tag_from_group(file: List[Path] = typer.Option(...,help=f".csv or .js
                 for row in csvreader:
                     tagKey = row.get("key")
                     tagValue = row.get("value")
-                    typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)
-                    remove.remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey)
+                    typer.secho(
+                        f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}",
+                        bold=True,
+                    )
+                    remove.remove_tag_from_group(
+                        snyktkn, group_id, force, tagValue, tagKey
+                    )
                 openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
                 for row in jsonreader:
                     tagKey = row.get("key")
                     tagValue = row.get("value")
-                    typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)
-                    remove.remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey)
+                    typer.secho(
+                        f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}",
+                        bold=True,
+                    )
+                    remove.remove_tag_from_group(
+                        snyktkn, group_id, force, tagValue, tagKey
+                    )
                 openfile.close()
             else:
-                print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                print(
+                    f"The file {openfile.name} is not valid, it must be either a .csv or a .json"
+                )
                 openfile.close()
         else:
             print(f"The file or path does not exist")
 
-@app.command(help=f"Remove a tag from a target with .csv or .json, for example {repoexample}")
-def remove_tag_from_target(file: List[Path] = typer.Option(...,help=f".csv or .json file with the format {removetagtargetexample}"),
-    snyktkn: str = typer.Option(...,  help="Snyk API token with org admin access",envvar=["SNYK_TOKEN"])):
+
+@app.command(
+    help=f"Remove a tag from a target with .csv or .json, for example {repoexample}"
+)
+def remove_tag_from_target(
+    file: List[Path] = typer.Option(
+        ..., help=f".csv or .json file with the format {removetagtargetexample}"
+    ),
+    snyktkn: str = typer.Option(
+        ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
+    ),
+):
     for path in file:
         if path.is_file():
             openfile = open(path)
@@ -123,8 +221,13 @@ def remove_tag_from_target(file: List[Path] = typer.Option(...,help=f".csv or .j
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    typer.secho(f"\nRemoving {key}:{value} from projects within {target}", bold=True)
-                    remove.remove_tags_from_projects(snyktkn,org_id, target, value, key)
+                    typer.secho(
+                        f"\nRemoving {key}:{value} from projects within {target}",
+                        bold=True,
+                    )
+                    remove.remove_tags_from_projects(
+                        snyktkn, org_id, target, value, key
+                    )
                 openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
@@ -133,11 +236,18 @@ def remove_tag_from_target(file: List[Path] = typer.Option(...,help=f".csv or .j
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    typer.secho(f"\nRemoving {key}:{value} from projects within {target}", bold=True)
-                    remove.remove_tags_from_projects(snyktkn,org_id, target, value, key)
+                    typer.secho(
+                        f"\nRemoving {key}:{value} from projects within {target}",
+                        bold=True,
+                    )
+                    remove.remove_tags_from_projects(
+                        snyktkn, org_id, target, value, key
+                    )
                 openfile.close()
             else:
-                print(f"The file {openfile.name} is not valid, it must be either a .csv or a .json")
+                print(
+                    f"The file {openfile.name} is not valid, it must be either a .csv or a .json"
+                )
                 openfile.close()
         else:
             print(f"The file or path does not exist")

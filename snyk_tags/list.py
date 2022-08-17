@@ -77,7 +77,7 @@ def create_client(token: str) -> httpx.Client:
 def find_tags(token: str, group_id: str, jsonflag: bool) -> tuple:
     with create_client(token=token) as client:
         req = client.get(f"group/{group_id}/tags")
-        group = client.get(f"group/{group_id}/orgs").json()
+        group = client.get(f"group/{group_id}/orgs", timeout=None).json()
         group_name = group["name"]
         if req.status_code == 200:
             if jsonflag is False:

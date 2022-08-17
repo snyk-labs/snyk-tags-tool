@@ -27,7 +27,7 @@ def create_client(token: str) -> httpx.Client:
 def get_org_ids(token: str, group_id: str) -> list:
     org_ids = []
     with create_client(token=token) as client:
-        req = client.get(f"group/{group_id}/orgs")
+        req = client.get(f"group/{group_id}/orgs", timeout=None)
         if req.status_code == 404:
             logging.error(
                 f"Group id: {group_id} is invalid. Error message: {req.json()}."
@@ -52,7 +52,9 @@ def apply_tag_to_project(
         "key": key,
         "value": tag,
     }
-    req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
+    req = client.post(
+        f"org/{org_id}/project/{project_id}/tags", data=tag_data, timeout=None
+    )
 
     if req.status_code == 200:
         logging.info(f"Successfully added {tag} tags to Project: {project_name}.")
@@ -70,7 +72,7 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
+            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
             for project in projects.get("projects"):
                 for type in types:
                     if project["type"] == type:

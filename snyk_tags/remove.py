@@ -69,7 +69,7 @@ def remove_tag_from_group(
         tag_data = {"key": key, "value": tag}
 
     with create_client(token=token) as client:
-        req = client.post(f"group/{group_id}/tags/delete", data=tag_data)
+        req = client.post(f"group/{group_id}/tags/delete", data=tag_data, timeout=None)
         group = client.get(f"group/{group_id}/orgs").json()
         group_name = group["name"]
 

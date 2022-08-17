@@ -37,7 +37,9 @@ def apply_tag_to_project(
         "value": tag,
     }
 
-    req = client.post(f"org/{org_id}/project/{project_id}/tags", data=tag_data)
+    req = client.post(
+        f"org/{org_id}/project/{project_id}/tags", data=tag_data, timeout=None
+    )
 
     if req.status_code == 200:
         logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
@@ -58,7 +60,7 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
+            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
             badname = 0
             rightname = 0
             for project in projects.get("projects"):
@@ -87,7 +89,7 @@ def apply_github_owner_to_repo(
     g = Github(githubtoken)
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects").json()
+            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
             badname = 0
             rightname = 0
             for project in projects.get("projects"):

@@ -62,6 +62,8 @@ python -m snyk-tags # To run snyk-tags
 
 ## Examples
 
+For the following examples you will need a Snyk API token, this can either be a personal Snyk Group/Org admin or a service account, [here](https://docs.snyk.io/snyk-api-info/authentication-for-api) is more information on how to generate a Snyk API token. You can then pass this token as part of the command through ```--snyktkn=abc``` or as an environment variable ```SNYK_TOKEN```
+
 I want to filter all my Snyk Code projects to the whole Snyk Group:
 
 ``` bash

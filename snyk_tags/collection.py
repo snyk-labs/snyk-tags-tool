@@ -64,7 +64,9 @@ def apply_tags_to_projects(
             badname = 0
             rightname = 0
             for project in projects.get("projects"):
-                if project["name"].startswith(name):
+                if project["name"].startswith(name + "(") or project["name"].startswith(
+                    name + ":"
+                ):
                     apply_tag_to_project(
                         client=client,
                         org_id=org_id,
@@ -93,7 +95,9 @@ def apply_github_owner_to_repo(
             badname = 0
             rightname = 0
             for project in projects.get("projects"):
-                if project["name"].startswith(name):
+                if project["name"].startswith(name + "(") or project["name"].startswith(
+                    name + ":"
+                ):
                     repo = g.get_repo(name)
                     apply_tag_to_project(
                         client=client,

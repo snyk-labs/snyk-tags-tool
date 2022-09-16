@@ -57,7 +57,7 @@ def apply_tag_to_project(
     )
 
     if req.status_code == 200:
-        logging.info(f"Successfully added {tag} tags to Project: {project_name}.")
+        logging.info(f"Successfully added {tag} tag to Project: {project_name}.")
     if req.status_code == 422:
         logging.warning(f"{tag} tag is already applied for Project: {project_name}.")
     if req.status_code == 404:
@@ -68,7 +68,7 @@ def apply_tag_to_project(
 
 
 def apply_tags_to_projects(
-    token: str, org_ids: list, types: list, tag: str, key: str
+    token: str, org_ids: list, types: list, tag: str, key: str, addprojecttype: bool
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
@@ -86,13 +86,24 @@ def apply_tags_to_projects(
                                 project_name=project["name"],
                             )
                         )
+                        if addprojecttype == True:
+                            logging.debug(
+                                apply_tag_to_project(
+                                    client=client,
+                                    org_id=org_id,
+                                    project_id=project["id"],
+                                    tag=type,
+                                    key="Type",
+                                    project_name=project["name"],
+                                )
+                            )
 
 
 # SAST Command
 sasttypes = typer.style("\n sast", bold=True, fg=typer.colors.MAGENTA)
 
 
-@app.command(help="Apply Code tag to Snyk Code projects")
+@app.command(help="Apply Code tag to Snyk Code projects - Product:Code")
 def sast(
     group_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -113,6 +124,11 @@ def sast(
         "",  # Default value of comamand
         help=f"Type of Snyk Code projects to apply tags to: {sasttypes}",
     ),
+    addprojecttype: bool = typer.Option(
+        False,
+        "--addprojecttype",  # Default value of comamand
+        help=f"Add an additional tag that will cover the project type e.g. Type:sast (default is false), use --addprojecttype to turn into True.",
+    ),
 ):
 
     org = []
@@ -126,7 +142,12 @@ def sast(
             )
             org_ids = get_org_ids(snyktkn, group_id)
             apply_tags_to_projects(
-                snyktkn, org_ids, sastType, tag="Code", key="Product"
+                snyktkn,
+                org_ids,
+                sastType,
+                tag="Code",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
         else:
             type.append(sastType)
@@ -135,7 +156,14 @@ def sast(
                 bold=True,
             )
             org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(snyktkn, org_ids, type, tag="Code", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org_ids,
+                type,
+                tag="Code",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
     else:
         if sastType == "" or None:
             sastType = ["sast"]
@@ -144,7 +172,14 @@ def sast(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, sastType, tag="Code", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                sastType,
+                tag="Code",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
         else:
             type.append(sastType)
             typer.secho(
@@ -152,7 +187,14 @@ def sast(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org_ids, type, tag="Code", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org_ids,
+                type,
+                tag="Code",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
 
 
 # IaC Command
@@ -163,7 +205,7 @@ iactypes = typer.style(
 )
 
 
-@app.command(help="Apply IaC tag to Snyk IaC projects")
+@app.command(help="Apply IaC tag to Snyk IaC projects - Product:IaC")
 def iac(
     group_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -184,6 +226,11 @@ def iac(
         "",  # Default value of comamand
         help=f"Type of Snyk IaC projects to apply tags to: {iactypes}",
     ),
+    addprojecttype: bool = typer.Option(
+        False,
+        "--addprojecttype",  # Default value of comamand
+        help=f"Add an additional tag that will cover the project type e.g. Type:terraformplan (default is false), use --addprojecttype to turn into True.",
+    ),
 ):
 
     org = []
@@ -203,7 +250,14 @@ def iac(
                 bold=True,
             )
             org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(snyktkn, org_ids, iacType, tag="IaC", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org_ids,
+                iacType,
+                tag="IaC",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
         else:
             type.append(iacType)
             typer.secho(
@@ -211,7 +265,14 @@ def iac(
                 bold=True,
             )
             org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(snyktkn, org, type, tag="IaC", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                type,
+                tag="IaC",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
     else:
         if iacType == "" or None:
             iacType = [
@@ -227,7 +288,14 @@ def iac(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, iacType, tag="IaC", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                iacType,
+                tag="IaC",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
         else:
             type.append(iacType)
             typer.secho(
@@ -235,7 +303,14 @@ def iac(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, type, tag="IaC", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                type,
+                tag="IaC",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
 
 
 # SCA Command
@@ -246,7 +321,9 @@ scatypes = typer.style(
 )
 
 
-@app.command(help="Apply Open Source tag to Snyk Open Source projects")
+@app.command(
+    help="Apply Open Source tag to Snyk Open Source projects - Product:OpenSource"
+)
 def sca(
     group_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -262,6 +339,11 @@ def sca(
         ...,  # Default value of comamand
         help="Snyk API token with org admin access",
         envvar=["SNYK_TOKEN"],
+    ),
+    addprojecttype: bool = typer.Option(
+        False,
+        "--addprojecttype",  # Default value of comamand
+        help=f"Add an additional tag that will cover the project type e.g. Type:maven (default is false), use --addprojecttype to turn into True.",
     ),
     scaType: str = typer.Option(
         "",  # Default value of comamand
@@ -300,7 +382,12 @@ def sca(
             )
             org_ids = get_org_ids(snyktkn, group_id)
             apply_tags_to_projects(
-                snyktkn, org_ids, scaType, tag="OpenSource", key="Product"
+                snyktkn,
+                org_ids,
+                scaType,
+                tag="OpenSource",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
         else:
             type.append(scaType)
@@ -310,7 +397,12 @@ def sca(
             )
             org_ids = get_org_ids(snyktkn, group_id)
             apply_tags_to_projects(
-                snyktkn, org_ids, type, tag="OpenSource", key="Product"
+                snyktkn,
+                org_ids,
+                type,
+                tag="OpenSource",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
     else:
         if scaType == "" or None:
@@ -341,7 +433,12 @@ def sca(
             )
             org.append(org_id)
             apply_tags_to_projects(
-                snyktkn, org, scaType, tag="OpenSource", key="Product"
+                snyktkn,
+                org,
+                scaType,
+                tag="OpenSource",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
         else:
             type.append(scaType)
@@ -350,7 +447,14 @@ def sca(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, type, tag="OpenSource", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                type,
+                tag="OpenSource",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
 
 
 # Container Command
@@ -359,7 +463,7 @@ containertypes = typer.style(
 )
 
 
-@app.command(help="Apply Container tag to Snyk Container projects")
+@app.command(help="Apply Container tag to Snyk Container projects - Product:Container")
 def container(
     group_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -380,6 +484,11 @@ def container(
         "",  # Default value of comamand
         help=f"Type of Snyk Container projects to apply tags to (default:all): {containertypes}",
     ),
+    addprojecttype: bool = typer.Option(
+        False,
+        "--addprojecttype",  # Default value of comamand
+        help=f"Add an additional tag that will cover the project type e.g. Type:dockerfile (default is false), use --addprojecttype to turn into True.",
+    ),
 ):
 
     org = []
@@ -393,7 +502,12 @@ def container(
             )
             org_ids = get_org_ids(snyktkn, group_id)
             apply_tags_to_projects(
-                snyktkn, org_ids, containerType, tag="Container", key="Product"
+                snyktkn,
+                org_ids,
+                containerType,
+                tag="Container",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
         else:
             type.append(containerType)
@@ -403,7 +517,12 @@ def container(
             )
             org_ids = get_org_ids(snyktkn, group_id)
             apply_tags_to_projects(
-                snyktkn, org_ids, type, tag="Container", key="Product"
+                snyktkn,
+                org_ids,
+                type,
+                tag="Container",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
     else:
         if containerType == "" or None:
@@ -414,7 +533,12 @@ def container(
             )
             org.append(org_id)
             apply_tags_to_projects(
-                snyktkn, org, containerType, tag="Container", key="Product"
+                snyktkn,
+                org,
+                containerType,
+                tag="Container",
+                key="Product",
+                addprojecttype=addprojecttype,
             )
         else:
             type.append(containerType)
@@ -423,7 +547,14 @@ def container(
                 bold=True,
             )
             org.append(org_id)
-            apply_tags_to_projects(snyktkn, org, type, tag="Container", key="Product")
+            apply_tags_to_projects(
+                snyktkn,
+                org,
+                type,
+                tag="Container",
+                key="Product",
+                addprojecttype=addprojecttype,
+            )
 
 
 # Custom Command
@@ -454,6 +585,11 @@ def custom(
     tagValue: str = typer.Option(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
+    addprojecttype: bool = typer.Option(
+        False,
+        "--addprojecttype",  # Default value of comamand
+        help=f"Add an additional tag that will cover the project type e.g. Type:dockerfile (default is false), use --addprojecttype to turn into True.",
+    ),
 ):
 
     typer.secho(
@@ -465,7 +601,11 @@ def custom(
     type.append(projectType)
     if org_id == "" or None:
         org_ids = get_org_ids(snyktkn, group_id)
-        apply_tags_to_projects(snyktkn, org_ids, type, tagValue, tagKey)
+        apply_tags_to_projects(
+            snyktkn, org_ids, type, tagValue, tagKey, addprojecttype=addprojecttype
+        )
     else:
         org.append(org_id)
-        apply_tags_to_projects(snyktkn, org, type, tagValue, tagKey)
+        apply_tags_to_projects(
+            snyktkn, org, type, tagValue, tagKey, addprojecttype=addprojecttype
+        )

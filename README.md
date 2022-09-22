@@ -76,6 +76,12 @@ I want to filter all my ```npm``` Snyk Open Source projects within a specific Sn
 snyk-tags tag sca --scatype=npm --org-id=abc --snyktkn=abc
 ```
 
+I want to filter all my Snyk projects sharing a common project name substring
+
+``` bash
+snyk-tags tag alltargets --contains-name=microservice --group-id=abc --org-id=abc --snyktkn=abc --tagkey=app --tagvalue=microservice
+```
+
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```project:snyk```
 
 ``` bash

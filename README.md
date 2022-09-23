@@ -76,6 +76,12 @@ I want to filter all my ```npm``` Snyk Open Source projects within a specific Sn
 snyk-tags tag sca --scatype=npm --org-id=abc --snyktkn=abc
 ```
 
+I want to filter all my Snyk projects sharing a common project name substring
+
+``` bash
+snyk-tags tag alltargets --contains-name=microservice --group-id=abc --org-id=abc --snyktkn=abc --tagkey=app --tagvalue=microservice
+```
+
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```project:snyk```
 
 ``` bash
@@ -98,6 +104,12 @@ I want to remove the tag project:snyk from the repo ```snyk-labs/nodejs-goof```
 
 ``` bash
 snyk-tags remove tag-from-target --target=snyk-labs/nodejs-goof --group-id=abc --snyktkn=abc --tagkey=project --tagkey=snyk
+```
+
+I want to remove the tag app:microservice from all targets within a specific Snyk Organization
+
+``` bash
+snyk-tags remove tag-from-alltargets --contains-name=apps-demo --org-id=abc --tagkey=app --tagvalue=microservice
 ```
 
 I want to filter all projects within ```snyk-labs/nodejs-goof``` and ```snyk-labs/goof``` repo by ```project:snyk``` so I use a csv in the format ```org-id,target,key,value```

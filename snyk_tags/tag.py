@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import logging
+import re
 import httpx
 import typer
 
@@ -97,6 +98,28 @@ def apply_tags_to_projects(
                                     project_name=project["name"],
                                 )
                             )
+
+
+def apply_tags_to_projects_by_name(
+    token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str
+) -> None:
+    exp = name + "+"
+    p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
+    with create_client(token=token) as client:
+        for org_id in org_ids:
+            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
+            for project in projects.get("projects"):
+                if p.search(project["name"]):
+                    logging.debug(
+                        apply_tag_to_project(
+                            client=client,
+                            org_id=org_id,
+                            project_id=project["id"],
+                            tag=tag,
+                            key=key,
+                            project_name=project["name"],
+                        )
+                    )
 
 
 # SAST Command
@@ -608,4 +631,56 @@ def custom(
         org.append(org_id)
         apply_tags_to_projects(
             snyktkn, org, type, tagValue, tagKey, addprojecttype=addprojecttype
+        )
+
+
+# alltargets Command
+@app.command(help="Apply tags at all targets on projects containing a common shared name")
+def alltargets(
+    group_id: str = typer.Option(
+        ...,  # Default value of comamand
+        help="Group ID of the Snyk Group you want to apply the tags to",
+        envvar=["GROUP_ID"],
+    ),
+    org_id: str = typer.Option(
+        "",  # Default value of comamand
+        envvar=["ORG_ID"],
+        help="Specify one Organization ID to only apply the tag to one organization",
+    ),
+    snyktkn: str = typer.Option(
+        ...,  # Default value of comamand
+        help="Snyk API token with org admin access",
+        envvar=["SNYK_TOKEN"],
+    ),
+    contains_name: str = typer.Option(
+        ...,  # Default value of comamand
+        help=f"Common name substring shared by projects to apply tags to",
+    ),
+    name_ignorecase: bool = typer.Option(
+        False,
+        "--name-ignorecase",  # Default value of comamand
+        help=f"name case-sensitive, use --name-ignorecase to perform case-insensitive matching.",
+    ),
+    tagKey: str = typer.Option(
+        ..., help="Tag key: identifier of the tag"  # Default value of comamand
+    ),
+    tagValue: str = typer.Option(
+        ..., help="Tag value: value of the tag"  # Default value of comamand
+    ),
+):
+
+    typer.secho(
+        f"\nAdding the tag key {tagKey} and tag value {tagValue} to {contains_name} projects in Snyk for easy filtering via the UI",
+        bold=True,
+    )
+    org = []
+    if org_id == "" or None:
+        org_ids = get_org_ids(snyktkn, group_id)
+        apply_tags_to_projects_by_name(
+            snyktkn, org_ids, contains_name, name_ignorecase, tagValue, tagKey
+        )
+    else:
+        org.append(org_id)
+        apply_tags_to_projects_by_name(
+            snyktkn, org, contains_name, name_ignorecase, tagValue, tagKey
         )

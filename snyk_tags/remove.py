@@ -142,7 +142,9 @@ def tag_from_target(
     remove_tags_from_projects(snyktkn, org_id, target, tagValue, tagKey)
 
 
-@app.command(help=f"Remove a tag from all targets, on projects containing a common shared name")
+@app.command(
+    help=f"Remove a tag from all targets, on projects containing a common shared name"
+)
 def tag_from_alltargets(
     org_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -173,7 +175,9 @@ def tag_from_alltargets(
     typer.secho(
         f"\nRemoving {tagKey}:{tagValue} from projects within {org_id}", bold=True
     )
-    remove_tags_from_projects_by_name(snyktkn, org_id, contains_name, name_ignorecase, tagValue, tagKey)
+    remove_tags_from_projects_by_name(
+        snyktkn, org_id, contains_name, name_ignorecase, tagValue, tagKey
+    )
 
 
 @app.command(help=f"Remove a tag from a Group, this can be forced through --force")

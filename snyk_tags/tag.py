@@ -154,70 +154,22 @@ def sast(
     ),
 ):
 
-    org = []
-    type = []
-    if org_id == "" or None:
-        if sastType == "" or None:
-            sastType = ["sast"]
-            typer.secho(
-                f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                sastType,
-                tag="Code",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(sastType)
-            typer.secho(
-                f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                type,
-                tag="Code",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-    else:
-        if sastType == "" or None:
-            sastType = ["sast"]
-            typer.secho(
-                f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                sastType,
-                tag="Code",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(sastType)
-            typer.secho(
-                f"\nAdding the Code tag to {sastType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                type,
-                tag="Code",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
+    type = ["sast"] if sastType is None or sastType == "" else [sastType]
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    typer.secho(
+        f"\nAdding the Code tag to {type} projects in Snyk for easy filtering via the UI",
+        bold=True,
+    )
+    apply_tags_to_projects(
+        snyktkn,
+        orgs,
+        type,
+        tag="Code",
+        key="Product",
+        addprojecttype=addprojecttype,
+    )
 
 
 # IaC Command
@@ -256,84 +208,33 @@ def iac(
     ),
 ):
 
-    org = []
-    type = []
-    if org_id == "" or None:
-        if iacType == "" or None:
-            iacType = [
-                "terraformconfig",
-                "terraformplan",
-                "k8sconfig",
-                "helmconfig",
-                "cloudformationconfig",
-                "armconfig",
-            ]
-            typer.secho(
-                f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                iacType,
-                tag="IaC",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(iacType)
-            typer.secho(
-                f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                type,
-                tag="IaC",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-    else:
-        if iacType == "" or None:
-            iacType = [
-                "terraformconfig",
-                "terraformplan",
-                "k8sconfig",
-                "helmconfig",
-                "cloudformationconfig",
-                "armconfig",
-            ]
-            typer.secho(
-                f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                iacType,
-                tag="IaC",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(iacType)
-            typer.secho(
-                f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                type,
-                tag="IaC",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
+    type = (
+        [
+            "terraformconfig",
+            "terraformplan",
+            "k8sconfig",
+            "helmconfig",
+            "cloudformationconfig",
+            "armconfig",
+        ]
+        if iacType is None or iacType == ""
+        else [iacType]
+    )
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    typer.secho(
+        f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
+        bold=True,
+    )
+    apply_tags_to_projects(
+        snyktkn,
+        orgs,
+        type,
+        tag="IaC",
+        key="Product",
+        addprojecttype=addprojecttype,
+    )
 
 
 # SCA Command
@@ -374,110 +275,46 @@ def sca(
     ),
 ):
 
-    org = []
-    type = []
-    if org_id == "" or None:
-        if scaType == "" or None:
-            scaType = [
-                "maven",
-                "npm",
-                "nuget",
-                "gradle",
-                "pip",
-                "yarn",
-                "gomodules",
-                "rubygems",
-                "composer",
-                "sbt",
-                "golangdep",
-                "cocoapods",
-                "poetry",
-                "govendor",
-                "cpp",
-                "yarn-workspace",
-                "hex",
-                "paket",
-                "golang",
-            ]
-            typer.secho(
-                f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                scaType,
-                tag="OpenSource",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(scaType)
-            typer.secho(
-                f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                type,
-                tag="OpenSource",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-    else:
-        if scaType == "" or None:
-            scaType = [
-                "maven",
-                "npm",
-                "nuget",
-                "gradle",
-                "pip",
-                "yarn",
-                "gomodules",
-                "rubygems",
-                "composer",
-                "sbt",
-                "golangdep",
-                "cocoapods",
-                "poetry",
-                "govendor",
-                "cpp",
-                "yarn-workspace",
-                "hex",
-                "paket",
-                "golang",
-            ]
-            typer.secho(
-                f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                scaType,
-                tag="OpenSource",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(scaType)
-            typer.secho(
-                f"\nAdding the Open Source tag to {scaType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                type,
-                tag="OpenSource",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
+    type = (
+        [
+            "maven",
+            "npm",
+            "nuget",
+            "gradle",
+            "pip",
+            "yarn",
+            "gomodules",
+            "rubygems",
+            "composer",
+            "sbt",
+            "golangdep",
+            "cocoapods",
+            "poetry",
+            "govendor",
+            "cpp",
+            "yarn-workspace",
+            "hex",
+            "paket",
+            "golang",
+        ]
+        if scaType is None or scaType == ""
+        else [scaType]
+    )
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    typer.secho(
+        f"\nAdding the OpenSource tag to {scaType} projects in Snyk for easy filtering via the UI",
+        bold=True,
+    )
+    apply_tags_to_projects(
+        snyktkn,
+        orgs,
+        type,
+        tag="OpenSource",
+        key="Product",
+        addprojecttype=addprojecttype,
+    )
 
 
 # Container Command
@@ -514,70 +351,26 @@ def container(
     ),
 ):
 
-    org = []
-    type = []
-    if org_id == "" or None:
-        if containerType == "" or None:
-            containerType = ["dockerfile", "apk", "deb", "rpm", "linux"]
-            typer.secho(
-                f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                containerType,
-                tag="Container",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(containerType)
-            typer.secho(
-                f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org_ids = get_org_ids(snyktkn, group_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org_ids,
-                type,
-                tag="Container",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-    else:
-        if containerType == "" or None:
-            containerType = ["dockerfile", "apk", "deb", "rpm", "linux"]
-            typer.secho(
-                f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                containerType,
-                tag="Container",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
-        else:
-            type.append(containerType)
-            typer.secho(
-                f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
-                bold=True,
-            )
-            org.append(org_id)
-            apply_tags_to_projects(
-                snyktkn,
-                org,
-                type,
-                tag="Container",
-                key="Product",
-                addprojecttype=addprojecttype,
-            )
+    type = (
+        ["dockerfile", "apk", "deb", "rpm", "linux"]
+        if containerType is None or containerType == ""
+        else [containerType]
+    )
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    typer.secho(
+        f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
+        bold=True,
+    )
+    apply_tags_to_projects(
+        snyktkn,
+        orgs,
+        type,
+        tag="Container",
+        key="Product",
+        addprojecttype=addprojecttype,
+    )
 
 
 # Custom Command
@@ -619,23 +412,21 @@ def custom(
         f"\nAdding the tag key {tagKey} and tag value {tagValue} to {projectType} projects in Snyk for easy filtering via the UI",
         bold=True,
     )
-    org = []
+
     type = []
     type.append(projectType)
-    if org_id == "" or None:
-        org_ids = get_org_ids(snyktkn, group_id)
-        apply_tags_to_projects(
-            snyktkn, org_ids, type, tagValue, tagKey, addprojecttype=addprojecttype
-        )
-    else:
-        org.append(org_id)
-        apply_tags_to_projects(
-            snyktkn, org, type, tagValue, tagKey, addprojecttype=addprojecttype
-        )
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    apply_tags_to_projects(
+        snyktkn, orgs, type, tagValue, tagKey, addprojecttype=addprojecttype
+    )
 
 
 # alltargets Command
-@app.command(help="Apply tags at all targets on projects containing a common shared name")
+@app.command(
+    help="Apply tags at all targets on projects containing a common shared name"
+)
 def alltargets(
     group_id: str = typer.Option(
         ...,  # Default value of comamand
@@ -673,14 +464,10 @@ def alltargets(
         f"\nAdding the tag key {tagKey} and tag value {tagValue} to {contains_name} projects in Snyk for easy filtering via the UI",
         bold=True,
     )
-    org = []
-    if org_id == "" or None:
-        org_ids = get_org_ids(snyktkn, group_id)
-        apply_tags_to_projects_by_name(
-            snyktkn, org_ids, contains_name, name_ignorecase, tagValue, tagKey
-        )
-    else:
-        org.append(org_id)
-        apply_tags_to_projects_by_name(
-            snyktkn, org, contains_name, name_ignorecase, tagValue, tagKey
-        )
+
+    orgs = (
+        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+    )
+    apply_tags_to_projects_by_name(
+        snyktkn, orgs, contains_name, name_ignorecase, tagValue, tagKey
+    )

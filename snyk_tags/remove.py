@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import typer
 import httpx
+import re
 from rich import print
 from snyk import SnykClient
 
@@ -49,6 +50,25 @@ def remove_tags_from_projects(
         print(
             f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]"
         )
+
+
+def remove_tags_from_projects_by_name(
+    token: str, org_id: str, name: str, ignorecase: bool, tag: str, key: str
+) -> None:
+    exp = name + "+"
+    p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
+    client = SnykClient(token=token)
+    projects = client.organizations.get(org_id).projects.all()
+    for project in projects:
+        if p.search(project.name):
+            remove_tag_from_project(
+                token=token,
+                org_id=org_id,
+                project_id=project.id,
+                tag=tag,
+                key=key,
+                project_name=project.name,
+            )
 
 
 # Reach to the API and generate tokens
@@ -120,6 +140,40 @@ def tag_from_target(
         f"\nRemoving {tagKey}:{tagValue} from projects within {target}", bold=True
     )
     remove_tags_from_projects(snyktkn, org_id, target, tagValue, tagKey)
+
+
+@app.command(help=f"Remove a tag from all targets, on projects containing a common shared name")
+def tag_from_alltargets(
+    org_id: str = typer.Option(
+        ...,  # Default value of comamand
+        envvar=["ORG_ID"],
+        help="Specify the Organization ID to remove the tag from",
+    ),
+    snyktkn: str = typer.Option(
+        ...,  # Default value of comamand
+        help="Snyk API token with org admin access",
+        envvar=["SNYK_TOKEN"],
+    ),
+    contains_name: str = typer.Option(
+        ...,  # Default value of comamand
+        help=f"Common name substring shared by projects to remove tags",
+    ),
+    name_ignorecase: bool = typer.Option(
+        False,
+        "--name-ignorecase",  # Default value of comamand
+        help=f"name case-sensitive, use --name-ignorecase to perform case-insensitive matching.",
+    ),
+    tagKey: str = typer.Option(
+        ..., help="Tag key: identifier of the tag"  # Default value of comamand
+    ),
+    tagValue: str = typer.Option(
+        ..., help="Tag value: value of the tag"  # Default value of comamand
+    ),
+):
+    typer.secho(
+        f"\nRemoving {tagKey}:{tagValue} from projects within {org_id}", bold=True
+    )
+    remove_tags_from_projects_by_name(snyktkn, org_id, contains_name, name_ignorecase, tagValue, tagKey)
 
 
 @app.command(help=f"Remove a tag from a Group, this can be forced through --force")

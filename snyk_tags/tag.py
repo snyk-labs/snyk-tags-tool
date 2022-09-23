@@ -101,9 +101,10 @@ def apply_tags_to_projects(
 
 
 def apply_tags_to_projects_by_name(
-    token: str, org_ids: list, name: str, tag: str, key: str
+    token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str
 ) -> None:
-    p = re.compile(name + "+", re.IGNORECASE)
+    exp = name + "+"
+    p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:
             projects = client.post(f"org/{org_id}/projects", timeout=None).json()
@@ -655,6 +656,11 @@ def alltargets(
         ...,  # Default value of comamand
         help=f"Common name substring shared by projects to apply tags to",
     ),
+    name_ignorecase: bool = typer.Option(
+        False,
+        "--name-ignorecase",  # Default value of comamand
+        help=f"name case-sensitive, use --name-ignorecase to perform case-insensitive matching.",
+    ),
     tagKey: str = typer.Option(
         ..., help="Tag key: identifier of the tag"  # Default value of comamand
     ),
@@ -671,10 +677,10 @@ def alltargets(
     if org_id == "" or None:
         org_ids = get_org_ids(snyktkn, group_id)
         apply_tags_to_projects_by_name(
-            snyktkn, org_ids, contains_name, tagValue, tagKey
+            snyktkn, org_ids, contains_name, name_ignorecase, tagValue, tagKey
         )
     else:
         org.append(org_id)
         apply_tags_to_projects_by_name(
-            snyktkn, org, contains_name, tagValue, tagKey
+            snyktkn, org, contains_name, name_ignorecase, tagValue, tagKey
         )

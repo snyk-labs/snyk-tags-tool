@@ -106,6 +106,12 @@ I want to remove the tag project:snyk from the repo ```snyk-labs/nodejs-goof```
 snyk-tags remove tag-from-target --target=snyk-labs/nodejs-goof --group-id=abc --snyktkn=abc --tagkey=project --tagkey=snyk
 ```
 
+I want to remove the tag app:microservice from all targets within a specific Snyk Organization
+
+``` bash
+snyk-tags remove tag-from-alltargets --contains-name=apps-demo --org-id=abc --tagkey=app --tagvalue=microservice
+```
+
 I want to filter all projects within ```snyk-labs/nodejs-goof``` and ```snyk-labs/goof``` repo by ```project:snyk``` so I use a csv in the format ```org-id,target,key,value```
 
 ``` bash

@@ -3,10 +3,9 @@
 import logging
 import httpx
 import typer
-from github import Github
 from rich import print
 
-from snyk_tags import __app_name__, __version__, attribute
+from snyk_tags import __app_name__, __version__, attribute, github
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +14,11 @@ logging.basicConfig(
 )
 
 app = typer.Typer()
+app.add_typer(
+    github.app,
+    name="github",
+    help="Use GitHub metadata such as CODEOWNERS and GitHub Topics to add to Snyk projects",
+)
 
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:
@@ -84,38 +88,6 @@ def apply_tags_to_projects(
                 )
 
 
-# GitHub Tagging Loop
-def apply_github_owner_to_repo(
-    snyktoken: str, org_ids: list, name: str, githubtoken: str
-) -> None:
-    g = Github(githubtoken)
-    with create_client(token=snyktoken) as client:
-        for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
-            badname = 0
-            rightname = 0
-            for project in projects.get("projects"):
-                if project["name"].startswith(name + "(") or project["name"].startswith(
-                    name + ":"
-                ):
-                    repo = g.get_repo(name)
-                    apply_tag_to_project(
-                        client=client,
-                        org_id=org_id,
-                        project_id=project["id"],
-                        tag=repo.owner.login,
-                        key="Owner",
-                        project_name=project["name"],
-                    )
-                    rightname = 1
-                else:
-                    badname = 1
-            if badname == 1 and rightname == 0:
-                print(
-                    f"[bold red]{name}[/bold red] is not a valid target, please check it is a target within the organization e.g. [bold blue]snyk-labs/snyk-goof[/bold blue]"
-                )
-
-
 # Coloured variables for output
 crit = typer.style("critical, high, medium, low", bold=True, fg=typer.colors.MAGENTA)
 enviro = typer.style(
@@ -158,39 +130,6 @@ def tag(
         fg=typer.colors.MAGENTA,
     )
     apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey)
-
-
-# GitHub Code Owner Tagging
-@app.command(
-    help=f"Add the GitHub code owner as a tag to the specified repo in Snyk, for example {repoexample}"
-)
-def github(
-    org_id: str = typer.Option(
-        ...,  # Default value of comamand
-        envvar=["ORG_ID"],
-        help="Specify the Organization ID where you want to apply the tag",
-    ),
-    snyktkn: str = typer.Option(
-        ...,  # Default value of comamand
-        help="Snyk API token with org admin access",
-        envvar=["SNYK_TOKEN"],
-    ),
-    target: str = typer.Option(
-        ...,  # Default value of comamand
-        help=f"Name of the repo, for example {repoexample}",
-    ),
-    githubtkn: str = typer.Option(
-        ...,  # Default value of comamand
-        help="GitHub Personal Access Token with access to the repository",
-        envvar=["GITHUB_TOKEN"],
-    ),
-):
-    typer.secho(
-        f"\nAdding the Owner tag to projects within {target} for easy filtering via the UI",
-        bold=True,
-        fg=typer.colors.MAGENTA,
-    )
-    apply_github_owner_to_repo(snyktkn, [org_id], target, githubtkn)
 
 
 # Collection command to apply the attributes to the collection

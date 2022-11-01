@@ -1,7 +1,7 @@
 # snyk_tags/__init__.py
 
 __app_name__ = "snyk_tags"
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 
 from logging import ERROR
 from sre_constants import SUCCESS

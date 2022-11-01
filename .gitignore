@@ -8,5 +8,6 @@ dist
 .DS_Store
 */.DS_Store
 tests/__pycache__
+tests/test_codeowners.py
 test.csv
 TODO

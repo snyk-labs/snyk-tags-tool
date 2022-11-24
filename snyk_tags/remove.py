@@ -55,7 +55,7 @@ def remove_tags_from_projects(
 def remove_tags_from_projects_by_name(
     token: str, org_id: str, name: str, ignorecase: bool, tag: str, key: str
 ) -> None:
-    exp = name + "+"
+    exp = name.replace('\\', '\\\\') + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     client = SnykClient(token=token)
     projects = client.organizations.get(org_id).projects.all()

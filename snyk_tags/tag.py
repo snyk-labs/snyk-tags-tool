@@ -103,7 +103,7 @@ def apply_tags_to_projects(
 def apply_tags_to_projects_by_name(
     token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str
 ) -> None:
-    exp = name.replace('\\', '\\\\') + "+"
+    exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:

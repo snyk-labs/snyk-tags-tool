@@ -3,6 +3,10 @@ import backoff
 
 
 def backoff_fatal_request_error(e):
+    if not hasattr(e, 'response') or not hasattr(e.response, 'status_code'):
+        # Errors which failed to get a response should retry.
+        # Network failures, for example.
+        return False
     if e.response.status_code == 429:
         return False
     return 400 <= e.response.status_code < 500
@@ -72,12 +76,17 @@ class Api:
             return
 
     @backoff.on_exception(backoff.expo, httpx.HTTPError, **backoff_params)
-    def set_project_tags(self, org_id: str, project_id: str, tag: dict[str, str]):
+    def add_project_tag(self, org_id: str, project_id: str, tag: dict[str, str]):
         with self.v1_client() as c:
             resp = c.post(
                 f"/org/{org_id}/project/{project_id}/tags", json=tag, timeout=None
             )
-            if resp.status_code == 422:
-                # TODO: Can we ignore just duplicate tag error response, making this idempotent?
-                return
+            resp.raise_for_status()
+
+    @backoff.on_exception(backoff.expo, httpx.HTTPError, **backoff_params)
+    def remove_project_tag(self, org_id: str, project_id: str, tag: dict[str, str]):
+        with self.v1_client() as c:
+            resp = c.post(
+                f"/org/{org_id}/project/{project_id}/tags/remove", json=tag, timeout=None
+            )
             resp.raise_for_status()

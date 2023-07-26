@@ -1,0 +1,25 @@
+name: PR
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.0.0
+        with:
+          python-version: 3.8
+      - name: Test and lint snyk-tags
+        run: |
+          pip install pytest
+          pip install poetry
+          pip install black
+          poetry install
+          pip install .
+          pytest
+          black --check snyk_tags

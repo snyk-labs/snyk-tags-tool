@@ -1,13 +1,17 @@
 #! /usr/bin/env python3
 
+import csv
+from enum import Enum
+import json
 import logging
-import httpx
+import sys
+
 import typer
-from rich import print
+from rich import print as rich_print
 
 from snyk_tags import __app_name__, __version__
 from snyk_tags.lib.api import Api
-from snyk_tags.lib.component_rules import parse_rules, project_matcher
+from snyk_tags.lib.component.rules import parse_rules, project_matcher
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,6 +20,101 @@ logging.basicConfig(
 )
 
 app = typer.Typer()
+
+
+class FormatType(str, Enum):
+    log = "log"
+    csv = "csv"
+    json = "json"
+
+
+class CsvFormatter:
+    def __init__(self):
+        self.wrote_header = False
+        self.w = csv.writer(sys.stdout)
+
+    def print(
+        self,
+        action: str,
+        component: str,
+        dry_run: bool,
+        exclusive: bool,
+        remove: bool,
+        project: any,
+    ):
+        if not self.wrote_header:
+            self.w.writerow(
+                [
+                    "action",
+                    "mode",
+                    "component",
+                    "project.id",
+                    "project.name",
+                    "project.origin",
+                    "project.target.display_name",
+                    "project.target.url",
+                    "project.target_reference",
+                ]
+            )
+            self.wrote_header = True
+        self.w.writerow(
+            [
+                "{}{}".format(dry_run and "would " or "", action),
+                "{}{}".format(
+                    remove and "remove" or "add",
+                    exclusive and " exclusive" or "",
+                ),
+                component,
+                project.get("id"),
+                project.get("name"),
+                project.get("origin"),
+                project.get("target", {}).get("display_name"),
+                project.get("target", {}).get("url"),
+                project.get("target_reference"),
+            ]
+        )
+        sys.stdout.flush()
+
+
+class JsonFormatter:
+    def print(
+        self,
+        action: str,
+        component: str,
+        dry_run: bool,
+        exclusive: bool,
+        remove: bool,
+        project: any,
+    ):
+        print(
+            json.dumps(
+                {
+                    "action": "{}{}".format(dry_run and "would " or "", action),
+                    "mode": "{}{}".format(
+                        remove and "remove" or "add",
+                        exclusive and " exclusive" or "",
+                    ),
+                    "component": component,
+                    "project": project,
+                }
+            )
+        )
+
+
+class LogFormatter:
+    def print(
+        self,
+        action: str,
+        component: str,
+        dry_run: bool,
+        exclusive: bool,
+        remove: bool,
+        project: any,
+    ):
+        rich_print(
+            f"""{'{}{}'.format(dry_run and "would " or "", action)
+                } "component:{component}" in project id="{project["id"]}" name="{project["name"]}\""""
+        )
 
 
 @app.command(help=f"Manage software component project tags")
@@ -43,7 +142,18 @@ def tag(
         default=False,
         help="Remove all other component tags from projects. When used in combination with --remove, all component tags are removed from matching projects.",
     ),
+    format: FormatType = typer.Option(
+        default=FormatType.log,
+        help="Output format, one of: log, csv, json",
+    ),
 ):
+    if format == "csv":
+        fmtr = CsvFormatter()
+    elif format == "json":
+        fmtr = JsonFormatter()
+    else:
+        fmtr = LogFormatter()
+
     with open(rules, "r") as f:
         rules_doc = parse_rules(f)
         (match_fn, context) = project_matcher(rules_doc)
@@ -53,10 +163,11 @@ def tag(
             # for rule input. Rules operate over project attributes, extended
             # with a "target" object property derived from the related target's
             # attributes.
-            project_obj = {}
+            project_obj = {"id": project["id"]}
             project_obj.update(**project.get("attributes", {}))
+
             target = (
-                project.get("relationships", {}).get("target", {}).get("attributes")
+                project.get("relationships", {}).get("target", {}).get("data", {}).get("attributes")
             )
             if target:
                 project_obj.update(target=target)
@@ -83,10 +194,19 @@ def tag(
                 if tag.get("key") == "component" and tag.get("value") != component
             )
 
+            print_format_args = {
+                "dry_run": dry_run,
+                "exclusive": exclusive,
+                "remove": remove,
+                "project": project_obj,
+            }
+
             if exclusive:
                 for other_component in other_component_tags:
-                    print(
-                        f"""{dry_run and "would remove" or "removing"} other tag "component:{other_component}" from project id="{project["id"]}" name="{project_obj["name"]}" (exclusive)"""
+                    fmtr.print(
+                        action="remove other tag",
+                        component=other_component,
+                        **print_format_args,
                     )
                     client.remove_project_tag(
                         org_id,
@@ -96,8 +216,8 @@ def tag(
 
             if remove:
                 if have_component_tag:
-                    print(
-                        f"""{dry_run and "would remove" or "removing"} tag "component:{component}" from project id="{project["id"]}" name="{project_obj["name"]}\""""
+                    fmtr.print(
+                        action="remove tag", component=component, **print_format_args
                     )
                     client.remove_project_tag(
                         org_id,
@@ -106,8 +226,8 @@ def tag(
                     )
             else:
                 if not have_component_tag:
-                    print(
-                        f"""{dry_run and "would add" or "adding"} tag "component:{component}" to project id="{project["id"]}" name="{project_obj["name"]}\""""
+                    fmtr.print(
+                        action="add tag", component=component, **print_format_args
                     )
                     client.add_project_tag(
                         org_id,
@@ -115,6 +235,6 @@ def tag(
                         tag={"key": "component", "value": component},
                     )
                 else:
-                    print(
-                        f"""tag "component:{component}" already present on project id="{project["id"]}" name="{project_obj["name"]}\""""
+                    fmtr.print(
+                        action="keep tag", component=component, **print_format_args
                     )

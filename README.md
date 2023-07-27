@@ -139,6 +139,12 @@ I want to filter all projects within ```snyk-labs/nodejs-goof``` and ```snyk-lab
 snyk-tags fromfile target-tag --file=path/to/file.csv --snyktkn
 ```
 
+I want to manage software component tags on projects in my Snyk Organization as a part of [Snyk Insights onboarding](https://docs.snyk.io/manage-issues/insights/insights-setup/insights-setup-associating-snyk-open-source-code-and-container-projects), based on rules which match and extract certain features of project and attributes. See section on [Component Tags](#component-tags-for-snyk-insights) below.
+
+```
+snyk-tags component tag --org-id=abc rules.yaml
+```
+
 ## Types of projects and attributes
 
 ### List of all project types
@@ -178,3 +184,97 @@ snyk-tags fromfile target-tag --file=path/to/file.csv --snyktkn
 |                      |    onprem   |                 |
 |                      |    hosted   |                 |
 |                      | distributed |                 |
+
+## Component tags for Snyk Insights
+
+Part of the setup process for Snyk Insights involves associating Snyk Open Source, Code and Container projects together. For a large organization this can be a daunting task. The `snyk-tags component tag` command allows automating the application of such tags based on regular expression matching and extraction.
+
+This tool may be run up-front as part of onboarding, but also as a regular batch job. This allows component tags to be more centrally managed across an organization.
+
+### Component rules
+
+The format for the rules file is as follows:
+
+```yaml
+# 'version' is the version of this rules file format, currently 1
+version: 1
+
+# 'rules' is an array of rule objects.
+# Rule objects are evaluated against each project in the specified --org-id
+# The first rule that matches is used to tag the project with its component: tag.
+# Rules are applied in the order in which they appear in this file.
+rules:
+
+  # A rule which normalizes component names across different types of projects.
+  # If you inspect the contents of Snyk projects, you'll find that different
+  # origins contain different identifiers and in different formats.
+  - name: my-retail-store
+
+    # 'projects' is a list of project matchers. Just like the rules, these are
+    # applied in the order in which they are defined here, the first one that
+    # matches is used to extract variables used in the component expression
+    # below.
+    projects:
+
+      # A project matcher which evaluates a regular expression against the
+      # project's 'name' attribute. If it matches, the named capture group
+      # "service_name" is stored as a variable.
+      - name:
+          regex: '^my-retail-store/(?P<service_name>\w+):'
+        # This matcher only applies to projects from Snyk's Github integration
+        origin: github
+
+      # A project matcher which extracts service_name from a container image
+      # project.
+      - name:
+          regex: '^(?P<service_name>\w+):'
+        origin: ecr
+
+      # A project matcher which matches and extracts from the target
+      # relationship.
+      - target:
+          url: 'http://github.com/my-retail-store/(?<service_name>\w+)\.git'
+        origin: cli
+
+    # Define the component tag for all matching projects. Snyk recommends a
+    # Package URL (pURL) format beginning with `pkg:` for use with Insights.
+    # Named capture values extracted in the matchers above may be interpolated
+    # here as variables, using Python's fstring formatting convention.
+    #
+    # Note that if a variable is used, the named capture must be present in all
+    # project matchers defined above.
+    component: 'pkg:github/my-retail-store/{service_name}@main'
+```
+
+Matchers operate on objects which are simplified from Projects API responses. Only these fields are supported -- though note that not all projects set all of these fields. The fields are shown below in YAML format, commented with their mapping from Projects REST API resources.
+
+```
+- name: '...'             # from data.attributes.name
+  origin: '...'           # from data.attributes.origin
+  target:
+    display_name: '...'   # from relationships.target.data.attributes.display_name
+    url: '...'            # from relationships.target.data.attributes.url
+  target_reference: '...' # from data.attributes.target_reference
+```
+
+### Tagging options
+
+`snyk-tags component tag --dry-run` lets you preview the consequences of the component tag rules before actually applying the changes to your projects. `--dry-run` may be used with any other option below.
+
+`snyk-tags component tag --remove` removes, rather than adds component tags, as derived using the same rules. This can be used as an "undo", in the event you find a problem with the rules.
+
+`snyk-tags component tag --exclusive` removes all tags with key `component` that _do not match_ the rules (whether adding or removing tags). Use with care as this option is more destructive, but may be useful in situations in which software components need to be completely redefined across an org.
+
+These previous two options combined, `snyk-tags component tag --remove --exclusive` will remove all tags with key `component` from matching projects.
+
+### Formatting options
+
+By default, `snyk-tags component tag` prints user-friendly log messages to standard output, indicating how each project is being processed.
+
+`--format csv` replaces the user-friendly log messages with a CSV output.
+
+`--format json` replaces the user-friendly log messages with a newline-delimited JSON (ndjson) output.
+
+To save this output to a file while still viewing output, piping to tee(1) is recommended, for example `snyk-tags component tag --format json | tee -a component-tags.ndjson`.
+
+Regardless of format, API activity is always logged to standard error for transparency and diagnostics.

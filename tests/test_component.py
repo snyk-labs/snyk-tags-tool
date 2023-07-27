@@ -67,7 +67,7 @@ rules:
     )
     assert result.exit_code == 0
     assert (
-        """would add tag "component:test-component" to project id="some-project" name="test\""""
+        """would add tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )
 
@@ -119,7 +119,7 @@ rules:
     )
     assert result.exit_code == 0
     assert (
-        """adding tag "component:test-component" to project id="some-project" name="test\""""
+        """add tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )
 
@@ -172,7 +172,7 @@ rules:
     )
     assert result.exit_code == 0
     assert (
-        """tag "component:test-component" already present on project id="some-project" name="test\""""
+        """keep tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )
 
@@ -231,11 +231,11 @@ rules:
     assert result.exit_code == 0
     print(result.stdout)
     assert (
-        """removing other tag "component:other-component" from project id="some-project" name="test" (exclusive)"""
+        """remove other tag "component:other-component" in project id="some-project" name="test\""""
         in result.stdout
     )
     assert (
-        """adding tag "component:test-component" to project id="some-project" name="test\""""
+        """add tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )
 
@@ -296,7 +296,7 @@ rules:
     )
     assert result.exit_code == 0
     assert (
-        """removing tag "component:test-component" from project id="some-project" name="test\""""
+        """remove tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )
 
@@ -364,10 +364,10 @@ rules:
     print(result.stdout)
     assert result.exit_code == 0
     assert (
-        """removing other tag "component:other-component" from project id="some-project" name="test" (exclusive)"""
+        """remove other tag "component:other-component" in project id="some-project" name="test\""""
         in result.stdout
     )
     assert (
-        """removing tag "component:test-component" from project id="some-project" name="test\""""
+        """remove tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )

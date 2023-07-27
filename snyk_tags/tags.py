@@ -3,7 +3,7 @@
 import typer
 
 from typing import Optional
-from snyk_tags import __app_name__, __version__, files, list, collection, tag, remove
+from snyk_tags import __app_name__, __version__, files, list, collection, tag, remove, component
 
 snyk = typer.style("snyk-tags", bold=True)
 snykcmd = typer.style("snyk-tags tag --help", bold=True, fg=typer.colors.MAGENTA)
@@ -38,6 +38,11 @@ app.add_typer(
     files.app,
     name="fromfile",
     help="Import tags and attributes from a csv file to a target e.g. Git repo",
+)
+app.add_typer(
+    component.app,
+    name="component",
+    help="Manage software component definitions with Snyk project tags",
 )
 
 

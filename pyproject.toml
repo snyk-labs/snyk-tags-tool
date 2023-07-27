@@ -14,7 +14,7 @@ snyk-tags = "snyk_tags.tags:app"
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
 typer = ">=0.5.0"
-httpx = "^0.23.0"
+httpx = "^0.24.0"
 colorama = "^0.4.5"
 shellingham = "^1.4.0"
 rich = ">=10.11.0"
@@ -29,6 +29,9 @@ requests = "2.31.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest-httpx = "^0.22.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

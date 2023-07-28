@@ -15,6 +15,7 @@ logging.basicConfig(
 
 app = typer.Typer()
 
+
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:
     return httpx.Client(
@@ -143,6 +144,7 @@ def apply_github_topics_to_repo(
 
 
 repoexample = typer.style("'snyk-labs/nodejs-goof'", bold=True, fg=typer.colors.MAGENTA)
+
 
 # GitHub Code Owner Tagging
 @app.command(

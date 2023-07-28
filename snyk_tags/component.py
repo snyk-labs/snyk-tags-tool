@@ -167,7 +167,10 @@ def tag(
             project_obj.update(**project.get("attributes", {}))
 
             target = (
-                project.get("relationships", {}).get("target", {}).get("data", {}).get("attributes")
+                project.get("relationships", {})
+                .get("target", {})
+                .get("data", {})
+                .get("attributes")
             )
             if target:
                 project_obj.update(target=target)

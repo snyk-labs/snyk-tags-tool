@@ -36,7 +36,7 @@ rule_schema = {
         "component": {
             "type": "string",
             "minLength": 1,
-        }
+        },
     },
     "required": ["name", "projects", "component"],
     "additionalProperties": False,
@@ -90,12 +90,12 @@ def parse_rules(input):
 def project_matcher(data):
     context = {}
     rule_matchers = []
-    for rule in data['rules']:
-        match_fns = [object_matcher(project, context) for project in rule['projects']]
-        rule_matchers.append((match_fns, rule['component']))
+    for rule in data["rules"]:
+        match_fns = [object_matcher(project, context) for project in rule["projects"]]
+        rule_matchers.append((match_fns, rule["component"]))
 
     def match_fn(obj: dict) -> str | None:
-        for (project_match_fns, component) in rule_matchers:
+        for project_match_fns, component in rule_matchers:
             if any([match_fn(obj) for match_fn in project_match_fns]):
                 return component
         return None

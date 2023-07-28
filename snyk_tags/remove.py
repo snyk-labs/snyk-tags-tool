@@ -7,11 +7,11 @@ from snyk import SnykClient
 
 app = typer.Typer()
 
+
 # Remove tags from a specific project
 def remove_tag_from_project(
     token: str, org_id: str, project_id: str, tag: str, key: str, project_name: str
 ) -> tuple:
-
     client = SnykClient(token=token)
     try:
         client.organizations.get(org_id).projects.get(project_id).tags.delete(key, tag)
@@ -82,7 +82,6 @@ def create_client(token: str) -> httpx.Client:
 def remove_tag_from_group(
     token: str, group_id: str, force: bool, tag: str, key: str
 ) -> tuple:
-
     if force is True:
         tag_data = {"key": key, "value": tag, "force": force}
     else:

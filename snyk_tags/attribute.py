@@ -16,6 +16,7 @@ logging.basicConfig(
 
 app = typer.Typer()
 
+
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:
     return httpx.Client(
@@ -34,7 +35,6 @@ def apply_attributes_to_project(
     lifecycle: list,
     project_name: str,
 ) -> tuple:
-
     if criticality != [""] and environment != [""] and lifecycle != [""]:
         attribute_data = {
             "criticality": criticality,

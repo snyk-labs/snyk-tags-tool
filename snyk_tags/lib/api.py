@@ -3,7 +3,7 @@ import backoff
 
 
 def backoff_fatal_request_error(e):
-    if not hasattr(e, 'response') or not hasattr(e.response, 'status_code'):
+    if not hasattr(e, "response") or not hasattr(e.response, "status_code"):
         # Errors which failed to get a response should retry.
         # Network failures, for example.
         return False
@@ -87,6 +87,8 @@ class Api:
     def remove_project_tag(self, org_id: str, project_id: str, tag: dict[str, str]):
         with self.v1_client() as c:
             resp = c.post(
-                f"/org/{org_id}/project/{project_id}/tags/remove", json=tag, timeout=None
+                f"/org/{org_id}/project/{project_id}/tags/remove",
+                json=tag,
+                timeout=None,
             )
             resp.raise_for_status()

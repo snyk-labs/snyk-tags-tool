@@ -20,6 +20,7 @@ app.add_typer(
     help="Use GitHub metadata such as CODEOWNERS and GitHub Topics to add to Snyk projects",
 )
 
+
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:
     return httpx.Client(

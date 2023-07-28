@@ -27,10 +27,8 @@ certifi = "2023.7.22"
 pygments = "2.15.0"
 requests = "2.31.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.4"
-
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
+pytest = "^6.0.0"
 pytest-httpx = "^0.22.0"
 
 [build-system]

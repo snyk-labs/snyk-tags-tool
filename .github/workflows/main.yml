@@ -29,8 +29,8 @@ jobs:
           pip install poetry
           pip install black
           poetry install
+          poetry run pytest
           pip install .
-          pytest
           black --check snyk_tags
       - name: Build and publish to pypi
         uses: JRubics/poetry-publish@v1.11

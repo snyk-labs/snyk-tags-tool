@@ -17,6 +17,7 @@ logging.basicConfig(
 
 app = typer.Typer()
 
+
 # Reach to the API and generate tokens
 def create_client(token: str) -> httpx.Client:
     return httpx.Client(
@@ -153,7 +154,6 @@ def sast(
         help=f"Add an additional tag that will cover the project type e.g. Type:sast (default is false), use --addprojecttype to turn into True.",
     ),
 ):
-
     type = ["sast"] if sastType is None or sastType == "" else [sastType]
     orgs = (
         get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
@@ -207,7 +207,6 @@ def iac(
         help=f"Add an additional tag that will cover the project type e.g. Type:terraformplan (default is false), use --addprojecttype to turn into True.",
     ),
 ):
-
     type = (
         [
             "terraformconfig",
@@ -274,7 +273,6 @@ def sca(
         help=f"Type of Snyk Open Source projects to apply tags to (default:all): {scatypes}",
     ),
 ):
-
     type = (
         [
             "maven",
@@ -350,7 +348,6 @@ def container(
         help=f"Add an additional tag that will cover the project type e.g. Type:dockerfile (default is false), use --addprojecttype to turn into True.",
     ),
 ):
-
     type = (
         ["dockerfile", "apk", "deb", "rpm", "linux"]
         if containerType is None or containerType == ""
@@ -407,7 +404,6 @@ def custom(
         help=f"Add an additional tag that will cover the project type e.g. Type:dockerfile (default is false), use --addprojecttype to turn into True.",
     ),
 ):
-
     typer.secho(
         f"\nAdding the tag key {tagKey} and tag value {tagValue} to {projectType} projects in Snyk for easy filtering via the UI",
         bold=True,
@@ -459,7 +455,6 @@ def alltargets(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
 ):
-
     typer.secho(
         f"\nAdding the tag key {tagKey} and tag value {tagValue} to {contains_name} projects in Snyk for easy filtering via the UI",
         bold=True,

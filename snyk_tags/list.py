@@ -14,6 +14,7 @@ console = Console()
 List all the different project types and attribute types
 """
 
+
 # List all project types command
 @app.command(help="List all Snyk project types")
 def types():

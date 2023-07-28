@@ -3,7 +3,16 @@
 import typer
 
 from typing import Optional
-from snyk_tags import __app_name__, __version__, files, list, collection, tag, remove, component
+from snyk_tags import (
+    __app_name__,
+    __version__,
+    files,
+    list,
+    collection,
+    tag,
+    remove,
+    component,
+)
 
 snyk = typer.style("snyk-tags", bold=True)
 snykcmd = typer.style("snyk-tags tag --help", bold=True, fg=typer.colors.MAGENTA)

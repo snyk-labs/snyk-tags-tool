@@ -141,7 +141,7 @@ snyk-tags fromfile target-tag --file=path/to/file.csv --snyktkn
 
 I want to manage software component tags on projects in my Snyk Organization as a part of [Snyk Insights onboarding](https://docs.snyk.io/manage-issues/insights/insights-setup/insights-setup-associating-snyk-open-source-code-and-container-projects), based on rules which match and extract certain features of project and attributes. See section on [Component Tags](#component-tags-for-snyk-insights) below.
 
-```
+```bash
 snyk-tags component tag --org-id=abc rules.yaml
 ```
 
@@ -259,13 +259,13 @@ Matchers operate on objects which are simplified from Projects API responses. On
 
 ### Tagging options
 
-`snyk-tags component tag --dry-run` lets you preview the consequences of the component tag rules before actually applying the changes to your projects. `--dry-run` may be used with any other option below.
+`snyk-tags component tag --dry-run rules.yaml` lets you preview the consequences of the component tag rules before actually applying the changes to your projects. `--dry-run` may be used with any other option below.
 
-`snyk-tags component tag --remove` removes, rather than adds component tags, as derived using the same rules. This can be used as an "undo", in the event you find a problem with the rules.
+`snyk-tags component tag --remove rules.yaml` removes, rather than adds component tags, as derived using the same rules. This can be used as an "undo", in the event you find a problem with the rules.
 
-`snyk-tags component tag --exclusive` removes all tags with key `component` that _do not match_ the rules (whether adding or removing tags). Use with care as this option is more destructive, but may be useful in situations in which software components need to be completely redefined across an org.
+`snyk-tags component tag --exclusive rules.yaml` removes all tags with key `component` that _do not match_ the rules (whether adding or removing tags). Use with care as this option is more destructive, but may be useful in situations in which software components need to be completely redefined across an org.
 
-These previous two options combined, `snyk-tags component tag --remove --exclusive` will remove all tags with key `component` from matching projects.
+These previous two options combined, `snyk-tags component tag --remove --exclusive ...` will remove all tags with key `component` from matching projects.
 
 ### Formatting options
 
@@ -275,6 +275,6 @@ By default, `snyk-tags component tag` prints user-friendly log messages to stand
 
 `--format json` replaces the user-friendly log messages with a newline-delimited JSON (ndjson) output.
 
-To save this output to a file while still viewing output, piping to tee(1) is recommended, for example `snyk-tags component tag --format json | tee -a component-tags.ndjson`.
+To save this output to a file while still viewing output, piping to tee(1) is recommended, for example `snyk-tags component tag --format json rules.yaml | tee -a component-tags.ndjson`.
 
 Regardless of format, API activity is always logged to standard error for transparency and diagnostics.

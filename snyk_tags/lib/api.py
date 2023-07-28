@@ -76,7 +76,7 @@ class Api:
             return
 
     @backoff.on_exception(backoff.expo, httpx.HTTPError, **backoff_params)
-    def add_project_tag(self, org_id: str, project_id: str, tag: dict[str, str]):
+    def add_project_tag(self, org_id: str, project_id: str, tag: dict):
         with self.v1_client() as c:
             resp = c.post(
                 f"/org/{org_id}/project/{project_id}/tags", json=tag, timeout=None
@@ -84,7 +84,7 @@ class Api:
             resp.raise_for_status()
 
     @backoff.on_exception(backoff.expo, httpx.HTTPError, **backoff_params)
-    def remove_project_tag(self, org_id: str, project_id: str, tag: dict[str, str]):
+    def remove_project_tag(self, org_id: str, project_id: str, tag: dict):
         with self.v1_client() as c:
             resp = c.post(
                 f"/org/{org_id}/project/{project_id}/tags/remove",

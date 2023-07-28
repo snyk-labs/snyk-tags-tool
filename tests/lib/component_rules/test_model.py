@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import jsonschema
 import pytest
 
-from snyk_tags.lib.component_rules import model
+from snyk_tags.lib.component.rules import model
 
 
 def test_model_parse():

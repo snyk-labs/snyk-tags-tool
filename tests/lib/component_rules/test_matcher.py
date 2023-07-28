@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from snyk_tags.lib.component_rules import model
-from snyk_tags.lib.component_rules.matcher import object_matcher
+from snyk_tags.lib.component.rules import model
+from snyk_tags.lib.component.rules.matcher import object_matcher
 
 
 def test_string_matcher():

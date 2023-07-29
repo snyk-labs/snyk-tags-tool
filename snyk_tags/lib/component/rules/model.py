@@ -94,7 +94,7 @@ def project_matcher(data):
         match_fns = [object_matcher(project, context) for project in rule["projects"]]
         rule_matchers.append((match_fns, rule["component"]))
 
-    def match_fn(obj: dict) -> str | None:
+    def match_fn(obj: dict) -> str:
         for project_match_fns, component in rule_matchers:
             if any([match_fn(obj) for match_fn in project_match_fns]):
                 return component

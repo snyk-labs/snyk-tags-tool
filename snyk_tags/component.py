@@ -211,32 +211,35 @@ def tag(
                         component=other_component,
                         **print_format_args,
                     )
-                    client.remove_project_tag(
-                        org_id,
-                        project["id"],
-                        tag={"key": "component", "value": other_component},
-                    )
+                    if not dry_run:
+                        client.remove_project_tag(
+                            org_id,
+                            project["id"],
+                            tag={"key": "component", "value": other_component},
+                        )
 
             if remove:
                 if have_component_tag:
                     fmtr.print(
                         action="remove tag", component=component, **print_format_args
                     )
-                    client.remove_project_tag(
-                        org_id,
-                        project["id"],
-                        tag={"key": "component", "value": component},
-                    )
+                    if not dry_run:
+                        client.remove_project_tag(
+                            org_id,
+                            project["id"],
+                            tag={"key": "component", "value": component},
+                        )
             else:
                 if not have_component_tag:
                     fmtr.print(
                         action="add tag", component=component, **print_format_args
                     )
-                    client.add_project_tag(
-                        org_id,
-                        project["id"],
-                        tag={"key": "component", "value": component},
-                    )
+                    if not dry_run:
+                        client.add_project_tag(
+                            org_id,
+                            project["id"],
+                            tag={"key": "component", "value": component},
+                        )
                 else:
                     fmtr.print(
                         action="keep tag", component=component, **print_format_args

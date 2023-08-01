@@ -229,7 +229,6 @@ rules:
         ],
     )
     assert result.exit_code == 0
-    print(result.stdout)
     assert (
         """remove other tag "component:other-component" in project id="some-project" name="test\""""
         in result.stdout
@@ -361,7 +360,6 @@ rules:
             str(rules_file),
         ],
     )
-    print(result.stdout)
     assert result.exit_code == 0
     assert (
         """remove other tag "component:other-component" in project id="some-project" name="test\""""
@@ -369,5 +367,164 @@ rules:
     )
     assert (
         """remove tag "component:test-component" in project id="some-project" name="test\""""
+        in result.stdout
+    )
+
+
+def test_component_tag_dry_run(tmpdir, httpx_mock):
+    rules_file = tmpdir.join("rules.yaml")
+    rules_file.write(
+        """
+version: 1
+rules:
+  - name: test
+    projects:
+      - name: test
+    component: test-component
+"""
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=re.compile("^.*/orgs/some-org/projects[?].*"),
+        json={
+            "data": [
+                {
+                    "id": "some-project",
+                    "attributes": {
+                        "name": "test",
+                        "tags": [],
+                    },
+                },
+            ],
+        },
+    )
+    httpx_mock.add_response(
+        status_code=400
+    )  # catch-all response, otherwise backoff retry will block testing
+
+    result = runner.invoke(
+        app,
+        [
+            "component",
+            "tag",
+            "--org-id",
+            "some-org",
+            "--snyktkn",
+            "some-token",
+            "--dry-run",
+            str(rules_file),
+        ],
+    )
+    assert result.exit_code == 0
+    assert (
+        """would add tag "component:test-component" in project id="some-project" name="test\""""
+        in result.stdout
+    )
+
+
+def test_component_tag_dry_run(tmpdir, httpx_mock):
+    rules_file = tmpdir.join("rules.yaml")
+    rules_file.write(
+        """
+version: 1
+rules:
+  - name: test
+    projects:
+      - name: test
+    component: test-component
+"""
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=re.compile("^.*/orgs/some-org/projects[?].*"),
+        json={
+            "data": [
+                {
+                    "id": "some-project",
+                    "attributes": {
+                        "name": "test",
+                        "tags": [{"key": "component", "value": "test-component"}],
+                    },
+                },
+            ],
+        },
+    )
+    httpx_mock.add_response(
+        status_code=400
+    )  # catch-all response, otherwise backoff retry will block testing
+
+    result = runner.invoke(
+        app,
+        [
+            "component",
+            "tag",
+            "--org-id",
+            "some-org",
+            "--snyktkn",
+            "some-token",
+            "--remove",
+            "--dry-run",
+            str(rules_file),
+        ],
+    )
+    assert result.exit_code == 0
+    assert (
+        """would remove tag "component:test-component" in project id="some-project" name="test\""""
+        in result.stdout
+    )
+
+
+def test_component_tag_dry_run_match_exclusive(tmpdir, httpx_mock):
+    rules_file = tmpdir.join("rules.yaml")
+    rules_file.write(
+        """
+version: 1
+rules:
+  - name: test
+    projects:
+      - name: test
+    component: test-component
+"""
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=re.compile("^.*/orgs/some-org/projects[?].*"),
+        json={
+            "data": [
+                {
+                    "id": "some-project",
+                    "attributes": {
+                        "name": "test",
+                        "tags": [{"key": "component", "value": "other-component"}],
+                    },
+                },
+            ],
+        },
+    )
+    httpx_mock.add_response(
+        status_code=400
+    )  # catch-all response, otherwise backoff retry will block testing
+
+    result = runner.invoke(
+        app,
+        [
+            "component",
+            "tag",
+            "--org-id",
+            "some-org",
+            "--snyktkn",
+            "some-token",
+            "--exclusive",
+            "--dry-run",
+            str(rules_file),
+        ],
+    )
+    assert result.exit_code == 0
+    assert (
+        """would remove other tag "component:other-component" in project id="some-project" name="test\""""
+        in result.stdout
+    )
+    assert (
+        """would add tag "component:test-component" in project id="some-project" name="test\""""
         in result.stdout
     )

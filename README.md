@@ -79,6 +79,8 @@ python -m snyk-tags # To run snyk-tags
 
 For the following examples you will need a Snyk API token, this can either be a personal Snyk Group/Org admin or a service account, [here](https://docs.snyk.io/snyk-api-info/authentication-for-api) is more information on how to generate a Snyk API token. You can then pass this token as part of the command through ```--snyktkn=abc``` or as an environment variable ```SNYK_TOKEN```
 
+### Applying tags by Snyk product
+
 I want to filter all my Snyk Code projects to the whole Snyk Group:
 
 ``` bash
@@ -91,11 +93,15 @@ I want to filter all my ```npm``` Snyk Open Source projects within a specific Sn
 snyk-tags tag sca --scatype=npm --org-id=abc --snyktkn=abc
 ```
 
+### Applying tags based on project name
+
 I want to filter all my Snyk projects sharing a common project name substring
 
 ``` bash
 snyk-tags tag alltargets --contains-name=microservice --group-id=abc --org-id=abc --snyktkn=abc --tagkey=app --tagvalue=microservice
 ```
+
+### Managing tags based on target SCM repository
 
 I want to filter all projects within my ```snyk-labs/nodejs-goof``` repo by ```project:snyk```
 
@@ -139,10 +145,50 @@ I want to filter all projects within ```snyk-labs/nodejs-goof``` and ```snyk-lab
 snyk-tags fromfile target-tag --file=path/to/file.csv --snyktkn
 ```
 
-I want to manage software component tags on projects in my Snyk Organization as a part of [Snyk Insights onboarding](https://docs.snyk.io/manage-issues/insights/insights-setup/insights-setup-associating-snyk-open-source-code-and-container-projects), based on rules which match and extract certain features of project and attributes. See section on [Component Tags](#component-tags-for-snyk-insights) below.
+### Defining software component tags for Snyk Insights
+
+I want to add `component` tags on projects in my Snyk Organization for [Snyk Insights](https://docs.snyk.io/manage-issues/insights/insights-setup/insights-setup-associating-snyk-open-source-code-and-container-projects), based on rules which match and extract certain features of project and attributes. See section on [Component Tags](#component-tags-for-snyk-insights) below.
 
 ```bash
 snyk-tags component tag --org-id=abc rules.yaml
+```
+
+I want to preview component tag processing changes before applying them.
+
+```bash
+snyk-tags component tag --dry-run rules.yaml
+```
+
+I want to remove all component tags, as determined by the same rules.
+
+```bash
+snyk-tags component tag --remove rules.yaml
+```
+
+I want to replace _all_ component tags that might exist on matching projects with only those specified by the rules.
+
+```bash
+snyk-tags component tag --exclusive rules.yaml
+```
+
+I want to remove _all_ component tags from matching projects.
+
+```bash
+snyk-tags component tag --remove --exclusive rules.yaml
+```
+
+#### Formatting options
+
+I want to store a CSV report of component tag rule processing to a file.
+
+```bash
+snyk-tags component tag --format csv rules.yaml | tee component-tags.csv
+```
+
+I want to append a newline-delimited JSON (ndjson) log of component tag processing to a file.
+
+```bash
+snyk-tags component tag --format json rules.yaml | tee -a component-tags.ndjson
 ```
 
 ## Types of projects and attributes
@@ -233,7 +279,8 @@ rules:
       # A project matcher which matches and extracts from the target
       # relationship.
       - target:
-          url: 'http://github.com/my-retail-store/(?<service_name>\w+)\.git'
+          url:
+            regex: 'http://github.com/my-retail-store/(?<service_name>\w+)\.git'
         origin: cli
 
     # Define the component tag for all matching projects. Snyk recommends a
@@ -256,25 +303,3 @@ Matchers operate on objects which are simplified from Projects API responses. On
     url: '...'            # from relationships.target.data.attributes.url
   target_reference: '...' # from data.attributes.target_reference
 ```
-
-### Tagging options
-
-`snyk-tags component tag --dry-run rules.yaml` lets you preview the consequences of the component tag rules before actually applying the changes to your projects. `--dry-run` may be used with any other option below.
-
-`snyk-tags component tag --remove rules.yaml` removes, rather than adds component tags, as derived using the same rules. This can be used as an "undo", in the event you find a problem with the rules.
-
-`snyk-tags component tag --exclusive rules.yaml` removes all tags with key `component` that _do not match_ the rules (whether adding or removing tags). Use with care as this option is more destructive, but may be useful in situations in which software components need to be completely redefined across an org.
-
-These previous two options combined, `snyk-tags component tag --remove --exclusive ...` will remove all tags with key `component` from matching projects.
-
-### Formatting options
-
-By default, `snyk-tags component tag` prints user-friendly log messages to standard output, indicating how each project is being processed.
-
-`--format csv` replaces the user-friendly log messages with a CSV output.
-
-`--format json` replaces the user-friendly log messages with a newline-delimited JSON (ndjson) output.
-
-To save this output to a file while still viewing output, piping to tee(1) is recommended, for example `snyk-tags component tag --format json rules.yaml | tee -a component-tags.ndjson`.
-
-Regardless of format, API activity is always logged to standard error for transparency and diagnostics.

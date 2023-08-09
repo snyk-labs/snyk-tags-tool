@@ -280,7 +280,7 @@ rules:
       # relationship.
       - target:
           url:
-            regex: 'http://github.com/my-retail-store/(?<service_name>\w+)\.git'
+            regex: 'http://github.com/my-retail-store/(?P<service_name>\w+)\.git'
         origin: cli
 
     # Define the component tag for all matching projects. Snyk recommends a

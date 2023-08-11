@@ -76,7 +76,6 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-
             client_v3 = SnykClient(token=token)
             projects = client_v3.organizations.get(org_id).projects.all()
 
@@ -113,7 +112,6 @@ def apply_tags_to_projects_by_name(
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:
-
             client_v3 = SnykClient(token=token)
             projects = client_v3.organizations.get(org_id).projects.all()
 

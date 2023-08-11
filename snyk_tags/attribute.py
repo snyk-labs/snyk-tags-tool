@@ -96,7 +96,6 @@ def apply_attributes_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-
             client_v3 = SnykClient(token=token)
             projects = client_v3.organizations.get(org_id).projects.all()
 

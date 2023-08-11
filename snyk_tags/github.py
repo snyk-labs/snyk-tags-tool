@@ -63,7 +63,6 @@ def apply_github_owner_to_repo(
     g = Github(githubtoken)
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
-
             client_v3 = SnykClient(token=snyktoken)
             projects = client_v3.organizations.get(org_id).projects.all()
 
@@ -116,7 +115,6 @@ def apply_github_topics_to_repo(
     g = Github(githubtoken)
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
-
             client_v3 = SnykClient(token=snyktoken)
             projects = client_v3.organizations.get(org_id).projects.all()
 

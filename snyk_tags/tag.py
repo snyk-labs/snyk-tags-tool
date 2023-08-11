@@ -2,12 +2,14 @@
 
 import logging
 import re
+
 import httpx
 import typer
-
 from rich import print
+from snyk import SnykClient
 
 from snyk_tags import __app_name__, __version__
+from snyk_tags.lib.api import Api
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,18 +76,21 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
-            for project in projects.get("projects"):
+
+            client_v3 = SnykClient(token=token)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
+            for project in projects:
                 for type in types:
-                    if project["type"] == type:
+                    if project.type == type:
                         logging.debug(
                             apply_tag_to_project(
                                 client=client,
                                 org_id=org_id,
-                                project_id=project["id"],
+                                project_id=project.id,
                                 tag=tag,
                                 key=key,
-                                project_name=project["name"],
+                                project_name=project.name,
                             )
                         )
                         if addprojecttype == True:
@@ -93,10 +98,10 @@ def apply_tags_to_projects(
                                 apply_tag_to_project(
                                     client=client,
                                     org_id=org_id,
-                                    project_id=project["id"],
+                                    project_id=project.id,
                                     tag=type,
                                     key="Type",
-                                    project_name=project["name"],
+                                    project_name=project.name,
                                 )
                             )
 
@@ -108,17 +113,20 @@ def apply_tags_to_projects_by_name(
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
-            for project in projects.get("projects"):
-                if p.search(project["name"]):
+
+            client_v3 = SnykClient(token=token)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
+            for project in projects:
+                if p.search(project.name):
                     logging.debug(
                         apply_tag_to_project(
                             client=client,
                             org_id=org_id,
-                            project_id=project["id"],
+                            project_id=project.id,
                             tag=tag,
                             key=key,
-                            project_name=project["name"],
+                            project_name=project.name,
                         )
                     )
 

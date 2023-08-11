@@ -1,9 +1,11 @@
 #! /usr/bin/env python3
 
 import logging
+
 import httpx
 import typer
 from rich import print
+from snyk import SnykClient
 
 from snyk_tags import __app_name__, __version__, attribute, github
 
@@ -65,22 +67,25 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
+
+            client_v3 = SnykClient(token=token)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
             badname = 0
             rightname = 0
-            for project in projects.get("projects"):
+            for project in projects:
                 if (
-                    project["name"] == name
-                    or project["name"].startswith(name + "(")
-                    or project["name"].startswith(name + ":")
+                    project.name == name
+                    or project.name.startswith(name + "(")
+                    or project.name.startswith(name + ":")
                 ):
                     apply_tag_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project["id"],
+                        project_id=project.id,
                         tag=tag,
                         key=key,
-                        project_name=project["name"],
+                        project_name=project.name,
                     )
                     rightname = 1
                 else:

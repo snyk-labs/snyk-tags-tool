@@ -1,10 +1,12 @@
 #! /usr/bin/env python3
 
+import json
 import logging
+
 import httpx
 import typer
-import json
 from rich import print
+from snyk import SnykClient
 
 from snyk_tags import __app_name__, __version__
 
@@ -94,19 +96,23 @@ def apply_attributes_to_projects(
 ) -> None:
     with create_client(token=token) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
+
+            client_v3 = SnykClient(token=token)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
             badname = 0
             rightname = 0
-            for project in projects.get("projects"):
-                if project["name"].startswith(name):
+
+            for project in projects:
+                if project.name.startswith(name):
                     apply_attributes_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project["id"],
+                        project_id=project.id,
                         criticality=criticality,
                         environment=environment,
                         lifecycle=lifecycle,
-                        project_name=project["name"],
+                        project_name=project.name,
                     )
                     rightname = 1
                 else:

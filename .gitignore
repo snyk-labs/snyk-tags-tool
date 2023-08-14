@@ -10,3 +10,4 @@ dist
 tests/test_codeowners.py
 test.csv
 TODO
+rules.yml

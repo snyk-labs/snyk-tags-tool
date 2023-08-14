@@ -1,11 +1,13 @@
 #! /usr/bin/env python3
 
 import logging
+import re
+
 import httpx
 import typer
 from github import Github
 from rich import print
-import re
+from snyk import SnykClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,11 +63,13 @@ def apply_github_owner_to_repo(
     g = Github(githubtoken)
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
+            client_v3 = SnykClient(token=snyktoken)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
             badname = 0
             rightname = 0
-            for project in projects.get("projects"):
-                if project["name"].startswith(name + "(") or project["name"].startswith(
+            for project in projects:
+                if project.name.startswith(name + "(") or project.name.startswith(
                     name + ":"
                 ):
                     repo = g.get_repo(name)
@@ -88,10 +92,10 @@ def apply_github_owner_to_repo(
                                             apply_tag_to_project(
                                                 client=client,
                                                 org_id=org_id,
-                                                project_id=project["id"],
+                                                project_id=project.id,
                                                 tag=owner,
                                                 key="Owner",
-                                                project_name=project["name"],
+                                                project_name=project.name,
                                             )
                                 else:
                                     print("Invalid CODEOWNERS file")
@@ -111,11 +115,13 @@ def apply_github_topics_to_repo(
     g = Github(githubtoken)
     with create_client(token=snyktoken) as client:
         for org_id in org_ids:
-            projects = client.post(f"org/{org_id}/projects", timeout=None).json()
+            client_v3 = SnykClient(token=snyktoken)
+            projects = client_v3.organizations.get(org_id).projects.all()
+
             badname = 0
             rightname = 0
-            for project in projects.get("projects"):
-                if project["name"].startswith(name + "(") or project["name"].startswith(
+            for project in projects:
+                if project.name.startswith(name + "(") or project.name.startswith(
                     name + ":"
                 ):
                     repo = g.get_repo(name)
@@ -129,10 +135,10 @@ def apply_github_topics_to_repo(
                             apply_tag_to_project(
                                 client=client,
                                 org_id=org_id,
-                                project_id=project["id"],
+                                project_id=project.id,
                                 tag=topic,
                                 key="GitHubTopic",
-                                project_name=project["name"],
+                                project_name=project.name,
                             )
                     rightname = 1
                 else:

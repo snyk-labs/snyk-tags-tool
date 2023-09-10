@@ -21,7 +21,11 @@ app = typer.Typer()
 
 # Reach to the API and generate tokens
 def create_client(token: str, tenant: str) -> httpx.Client:
-    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     headers = {"Authorization": f"token {token}"}
     return httpx.Client(base_url=base_url, headers=headers)
 
@@ -65,7 +69,7 @@ def apply_attributes_to_project(
     criticality = typer.style(criticality, bold=True, fg=typer.colors.MAGENTA)
     environment = typer.style(environment, bold=True, fg=typer.colors.MAGENTA)
     lifecycle = typer.style(lifecycle, bold=True, fg=typer.colors.MAGENTA)
-    
+
     if req.status_code == 200:
         logging.info(
             f"Successfully added {criticality},{environment},{lifecycle} attributes to Project: {project_name}."
@@ -97,23 +101,29 @@ def apply_attributes_to_projects(
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
-            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            base_url = (
+                f"https://api.{tenant}.snyk.io/rest"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/rest"
+            )
+            client_v3 = SnykClient(
+                token=token, url=base_url, version="2023-08-31~experimental"
+            )
             projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
 
-            for project in projects['data']:
-                if project['attributes']['name'].startswith(name):
+            for project in projects["data"]:
+                if project["attributes"]["name"].startswith(name):
                     apply_attributes_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project['id'],
+                        project_id=project["id"],
                         criticality=criticality,
                         environment=environment,
                         lifecycle=lifecycle,
-                        project_name=project['attributes']['name'],
+                        project_name=project["attributes"]["name"],
                     )
                     rightname = 1
                 else:

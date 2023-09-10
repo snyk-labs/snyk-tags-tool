@@ -69,7 +69,11 @@ def attributes():
 
 # Functions for tags listing command
 def create_client(token: str, tenant: str) -> httpx.Client:
-    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     headers = {"Authorization": f"token {token}"}
     return httpx.Client(base_url=base_url, headers=headers)
 
@@ -119,4 +123,9 @@ def tags(
         help=f"Output into json format (default is a table), use --json to change output.",
     ),
 ):
-    find_tags(snyktkn, group_id, json, tenant=tenant,)
+    find_tags(
+        snyktkn,
+        group_id,
+        json,
+        tenant=tenant,
+    )

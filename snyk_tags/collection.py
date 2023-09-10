@@ -25,7 +25,11 @@ app.add_typer(
 
 # Reach to the API and generate tokens
 def create_client(token: str, tenant: str) -> httpx.Client:
-    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     headers = {"Authorization": f"token {token}"}
     return httpx.Client(base_url=base_url, headers=headers)
 
@@ -67,25 +71,31 @@ def apply_tags_to_projects(
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
-            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            base_url = (
+                f"https://api.{tenant}.snyk.io/rest"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/rest"
+            )
+            client_v3 = SnykClient(
+                token=token, url=base_url, version="2023-08-31~experimental"
+            )
             projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
-            for project in projects['data']:
+            for project in projects["data"]:
                 if (
-                    project['attributes']['name'] == name
-                    or project['attributes']['name'](name + "(")
-                    or project['attributes']['name'](name + ":")
+                    project["attributes"]["name"] == name
+                    or project["attributes"]["name"](name + "(")
+                    or project["attributes"]["name"](name + ":")
                 ):
                     apply_tag_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project['id'],
+                        project_id=project["id"],
                         tag=tag,
                         key=key,
-                        project_name=project['attributes']['name'],
+                        project_name=project["attributes"]["name"],
                     )
                     rightname = 1
                 else:
@@ -181,5 +191,11 @@ def attributes(
         fg=typer.colors.MAGENTA,
     )
     attribute.apply_attributes_to_projects(
-        snyktkn, [org_id], target, [criticality], [environment], [lifecycle], tenant=tenant
+        snyktkn,
+        [org_id],
+        target,
+        [criticality],
+        [environment],
+        [lifecycle],
+        tenant=tenant,
     )

@@ -22,9 +22,14 @@ app = typer.Typer()
 
 # Reach to the API and generate tokens
 def create_client(token: str, tenant: str) -> httpx.Client:
-    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     headers = {"Authorization": f"token {token}"}
     return httpx.Client(base_url=base_url, headers=headers)
+
 
 # Get all organizations within a Group
 def get_org_ids(token: str, group_id: str, tenant: str) -> list:
@@ -71,24 +76,36 @@ def apply_tag_to_project(
 
 
 def apply_tags_to_projects(
-    token: str, org_ids: list, types: list, tag: str, key: str, addprojecttype: bool, tenant: str
+    token: str,
+    org_ids: list,
+    types: list,
+    tag: str,
+    key: str,
+    addprojecttype: bool,
+    tenant: str,
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
-            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            base_url = (
+                f"https://api.{tenant}.snyk.io/rest"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/rest"
+            )
+            client_v3 = SnykClient(
+                token=token, url=base_url, version="2023-08-31~experimental"
+            )
             projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
-            for project in projects['data']:
-                if project['attributes']['type'] in types:
+            for project in projects["data"]:
+                if project["attributes"]["type"] in types:
                     logging.debug(
                         apply_tag_to_project(
                             client=client,
                             org_id=org_id,
-                            project_id=project['id'],
+                            project_id=project["id"],
                             tag=tag,
                             key=key,
-                            project_name=project['attributes']['name'],
+                            project_name=project["attributes"]["name"],
                         )
                     )
                     if addprojecttype == True:
@@ -96,35 +113,47 @@ def apply_tags_to_projects(
                             apply_tag_to_project(
                                 client=client,
                                 org_id=org_id,
-                                project_id=project['id'],
-                                tag=project['attributes']['type'],
+                                project_id=project["id"],
+                                tag=project["attributes"]["type"],
                                 key="Type",
-                                project_name=project['attributes']['name'],
+                                project_name=project["attributes"]["name"],
                             )
                         )
 
 
 def apply_tags_to_projects_by_name(
-    token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str, tenant: str
+    token: str,
+    org_ids: list,
+    name: str,
+    ignorecase: bool,
+    tag: str,
+    key: str,
+    tenant: str,
 ) -> None:
     exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:
-            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
-            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            base_url = (
+                f"https://api.{tenant}.snyk.io/rest"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/rest"
+            )
+            client_v3 = SnykClient(
+                token=token, url=base_url, version="2023-08-31~experimental"
+            )
             projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
-            for project in projects['data']:
-                if p.search(project['attributes']['name']):
+            for project in projects["data"]:
+                if p.search(project["attributes"]["name"]):
                     logging.debug(
                         apply_tag_to_project(
                             client=client,
                             org_id=org_id,
-                            project_id=project['id'],
+                            project_id=project["id"],
                             tag=tag,
                             key=key,
-                            project_name=project['attributes']['name'],
+                            project_name=project["attributes"]["name"],
                         )
                     )
 
@@ -166,7 +195,9 @@ def sast(
 ):
     type = ["sast"] if sastType is None or sastType == "" else [sastType]
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     typer.secho(
         f"\nAdding the Code tag to {type} projects in Snyk for easy filtering via the UI",
@@ -235,7 +266,9 @@ def iac(
         else [iacType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     typer.secho(
         f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
@@ -319,7 +352,9 @@ def sca(
         else [scaType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     typer.secho(
         f"\nAdding the OpenSource tag to {scaType} projects in Snyk for easy filtering via the UI",
@@ -379,7 +414,9 @@ def container(
         else [containerType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     typer.secho(
         f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
@@ -442,10 +479,18 @@ def custom(
     type = []
     type.append(projectType)
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     apply_tags_to_projects(
-        snyktkn, orgs, type, tagValue, tagKey,tenant=tenant, addprojecttype=addprojecttype
+        snyktkn,
+        orgs,
+        type,
+        tagValue,
+        tagKey,
+        tenant=tenant,
+        addprojecttype=addprojecttype,
     )
 
 
@@ -495,8 +540,16 @@ def alltargets(
     )
 
     orgs = (
-        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant)
+        if org_id is None or org_id == ""
+        else [org_id]
     )
     apply_tags_to_projects_by_name(
-        snyktkn, orgs, contains_name, name_ignorecase, tagValue, tagKey, tenant=tenant,
+        snyktkn,
+        orgs,
+        contains_name,
+        name_ignorecase,
+        tagValue,
+        tagKey,
+        tenant=tenant,
     )

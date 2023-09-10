@@ -68,15 +68,19 @@ def attributes():
 
 
 # Functions for tags listing command
-def create_client(token: str) -> httpx.Client:
-    return httpx.Client(
-        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
     )
+    headers = {"Authorization": f"token {token}"}
+    return httpx.Client(base_url=base_url, headers=headers)
 
 
 # Get the tags from a group
-def find_tags(token: str, group_id: str, jsonflag: bool) -> tuple:
-    with create_client(token=token) as client:
+def find_tags(token: str, group_id: str, jsonflag: bool, tenant: str) -> tuple:
+    with create_client(token=token, tenant=tenant) as client:
         req = client.get(f"group/{group_id}/tags")
         group = client.get(f"group/{group_id}/orgs", timeout=None).json()
         group_name = group["name"]
@@ -109,10 +113,19 @@ def tags(
         help="Snyk API token with Group admin access",
         envvar=["SNYK_TOKEN"],
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     json: bool = typer.Option(
         False,
         "--json",  # Default value of comamand
         help=f"Output into json format (default is a table), use --json to change output.",
     ),
 ):
-    find_tags(snyktkn, group_id, json)
+    find_tags(
+        snyktkn,
+        group_id,
+        json,
+        tenant=tenant,
+    )

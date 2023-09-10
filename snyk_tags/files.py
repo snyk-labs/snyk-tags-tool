@@ -31,6 +31,10 @@ def target_tag(
     snyktkn: str = typer.Option(
         ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     for path in file:
         if path.is_file():
@@ -47,7 +51,7 @@ def target_tag(
                         bold=True,
                     )
                     collection.apply_tags_to_projects(
-                        snyktkn, [org_id], target, value, key
+                        snyktkn, [org_id], target, value, key, tenant
                     )
                 openfile.close()
             elif ".json" in openfile.name:
@@ -62,7 +66,7 @@ def target_tag(
                         bold=True,
                     )
                     collection.apply_tags_to_projects(
-                        snyktkn, [org_id], target, value, key
+                        snyktkn, [org_id], target, value, key, tenant
                     )
                 openfile.close()
             else:
@@ -84,6 +88,10 @@ def target_attributes(
     snyktkn: str = typer.Option(
         ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     for path in file:
         if path.is_file():
@@ -108,6 +116,7 @@ def target_attributes(
                         [criticality],
                         [environment],
                         [lifecycle],
+                        tenant,
                     )
                 openfile.close()
             elif ".json" in openfile.name:
@@ -130,6 +139,7 @@ def target_attributes(
                         [criticality],
                         [environment],
                         [lifecycle],
+                        tenant,
                     )
                 openfile.close()
             else:

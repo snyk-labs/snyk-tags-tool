@@ -20,11 +20,10 @@ app = typer.Typer()
 
 
 # Reach to the API and generate tokens
-def create_client(token: str) -> httpx.Client:
-    return httpx.Client(
-        base_url="https://snyk.io/api/v1",
-        headers={"Authorization": f"token {token}", "Content-Type": "application/json"},
-    )
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    headers = {"Authorization": f"token {token}"}
+    return httpx.Client(base_url=base_url, headers=headers)
 
 
 # Apply attributes to a specific project
@@ -66,19 +65,20 @@ def apply_attributes_to_project(
     criticality = typer.style(criticality, bold=True, fg=typer.colors.MAGENTA)
     environment = typer.style(environment, bold=True, fg=typer.colors.MAGENTA)
     lifecycle = typer.style(lifecycle, bold=True, fg=typer.colors.MAGENTA)
+    
     if req.status_code == 200:
         logging.info(
             f"Successfully added {criticality},{environment},{lifecycle} attributes to Project: {project_name}."
         )
-    if req.status_code == 422:
+    elif req.status_code == 422:
         logging.warning(
             f"Data {attribute_data} cannot be processed, make sure you have written the correct values (refer to help or Readme) and that they are in low caps. Error message: {req.json()}."
         )
-    if req.status_code == 404:
+    elif req.status_code == 404:
         logging.error(
             f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}."
         )
-    if req.status_code == 500:
+    elif req.status_code == 500:
         logging.error(
             f"Error message: {req.json()}. Please contact eric.fernandez@snyk.io."
         )
@@ -93,25 +93,27 @@ def apply_attributes_to_projects(
     criticality: list,
     environment: list,
     lifecycle: list,
+    tenant: str,
 ) -> None:
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=token)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
 
-            for project in projects:
-                if project.name.startswith(name):
+            for project in projects['data']:
+                if project['attributes']['name'].startswith(name):
                     apply_attributes_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project.id,
+                        project_id=project['id'],
                         criticality=criticality,
                         environment=environment,
                         lifecycle=lifecycle,
-                        project_name=project.name,
+                        project_name=project['attributes']['name'],
                     )
                     rightname = 1
                 else:

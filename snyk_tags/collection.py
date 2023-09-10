@@ -24,10 +24,10 @@ app.add_typer(
 
 
 # Reach to the API and generate tokens
-def create_client(token: str) -> httpx.Client:
-    return httpx.Client(
-        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
-    )
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    headers = {"Authorization": f"token {token}"}
+    return httpx.Client(base_url=base_url, headers=headers)
 
 
 # Apply tags to a specific project
@@ -50,11 +50,11 @@ def apply_tag_to_project(
 
     if req.status_code == 200:
         logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
-    if req.status_code == 422:
+    elif req.status_code == 422:
         logging.warning(
             f"Tag {key}:{tag} is already applied for Project: {project_name}."
         )
-    if req.status_code == 404:
+    elif req.status_code == 404:
         logging.error(
             f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}."
         )
@@ -63,28 +63,29 @@ def apply_tag_to_project(
 
 # Tagging loop
 def apply_tags_to_projects(
-    token: str, org_ids: list, name: str, tag: str, key: str
+    token: str, org_ids: list, name: str, tag: str, key: str, tenant: str
 ) -> None:
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=token)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
-            for project in projects:
+            for project in projects['data']:
                 if (
-                    project.name == name
-                    or project.name.startswith(name + "(")
-                    or project.name.startswith(name + ":")
+                    project['attributes']['name'] == name
+                    or project['attributes']['name'](name + "(")
+                    or project['attributes']['name'](name + ":")
                 ):
                     apply_tag_to_project(
                         client=client,
                         org_id=org_id,
-                        project_id=project.id,
+                        project_id=project['id'],
                         tag=tag,
                         key=key,
-                        project_name=project.name,
+                        project_name=project['attributes']['name'],
                     )
                     rightname = 1
                 else:
@@ -124,6 +125,10 @@ def tag(
         ...,  # Default value of comamand
         help=f"Name of the target, for example {repoexample}",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     tagKey: str = typer.Option(
         ..., help="Tag key: identifier of the tag"  # Default value of comamand
     ),
@@ -136,7 +141,7 @@ def tag(
         bold=True,
         fg=typer.colors.MAGENTA,
     )
-    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey)
+    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey, tenant=tenant)
 
 
 # Collection command to apply the attributes to the collection
@@ -165,6 +170,10 @@ def attributes(
     lifecycle: str = typer.Option(
         "", help=f"Lifecycle attribute: {life}"  # Default value of comamand
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(
         f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI",
@@ -172,5 +181,5 @@ def attributes(
         fg=typer.colors.MAGENTA,
     )
     attribute.apply_attributes_to_projects(
-        snyktkn, [org_id], target, [criticality], [environment], [lifecycle]
+        snyktkn, [org_id], target, [criticality], [environment], [lifecycle], tenant=tenant
     )

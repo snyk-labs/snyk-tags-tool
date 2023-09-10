@@ -21,16 +21,15 @@ app = typer.Typer()
 
 
 # Reach to the API and generate tokens
-def create_client(token: str) -> httpx.Client:
-    return httpx.Client(
-        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
-    )
-
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    headers = {"Authorization": f"token {token}"}
+    return httpx.Client(base_url=base_url, headers=headers)
 
 # Get all organizations within a Group
-def get_org_ids(token: str, group_id: str) -> list:
+def get_org_ids(token: str, group_id: str, tenant: str) -> list:
     org_ids = []
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         req = client.get(f"group/{group_id}/orgs", timeout=None)
         if req.status_code == 404:
             logging.error(
@@ -62,9 +61,9 @@ def apply_tag_to_project(
 
     if req.status_code == 200:
         logging.info(f"Successfully added {tag} tag to Project: {project_name}.")
-    if req.status_code == 422:
+    elif req.status_code == 422:
         logging.warning(f"{tag} tag is already applied for Project: {project_name}.")
-    if req.status_code == 404:
+    elif req.status_code == 404:
         logging.error(
             f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}."
         )
@@ -72,59 +71,60 @@ def apply_tag_to_project(
 
 
 def apply_tags_to_projects(
-    token: str, org_ids: list, types: list, tag: str, key: str, addprojecttype: bool
+    token: str, org_ids: list, types: list, tag: str, key: str, addprojecttype: bool, tenant: str
 ) -> None:
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=token)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
-            for project in projects:
-                for type in types:
-                    if project.type == type:
+            for project in projects['data']:
+                if project['attributes']['type'] in types:
+                    logging.debug(
+                        apply_tag_to_project(
+                            client=client,
+                            org_id=org_id,
+                            project_id=project['id'],
+                            tag=tag,
+                            key=key,
+                            project_name=project['attributes']['name'],
+                        )
+                    )
+                    if addprojecttype == True:
                         logging.debug(
                             apply_tag_to_project(
                                 client=client,
                                 org_id=org_id,
-                                project_id=project.id,
-                                tag=tag,
-                                key=key,
-                                project_name=project.name,
+                                project_id=project['id'],
+                                tag=project['attributes']['type'],
+                                key="Type",
+                                project_name=project['attributes']['name'],
                             )
                         )
-                        if addprojecttype == True:
-                            logging.debug(
-                                apply_tag_to_project(
-                                    client=client,
-                                    org_id=org_id,
-                                    project_id=project.id,
-                                    tag=type,
-                                    key="Type",
-                                    project_name=project.name,
-                                )
-                            )
 
 
 def apply_tags_to_projects_by_name(
-    token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str
+    token: str, org_ids: list, name: str, ignorecase: bool, tag: str, key: str, tenant: str
 ) -> None:
     exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     with create_client(token=token) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=token)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=token,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
-            for project in projects:
-                if p.search(project.name):
+            for project in projects['data']:
+                if p.search(project['attributes']['name']):
                     logging.debug(
                         apply_tag_to_project(
                             client=client,
                             org_id=org_id,
-                            project_id=project.id,
+                            project_id=project['id'],
                             tag=tag,
                             key=key,
-                            project_name=project.name,
+                            project_name=project['attributes']['name'],
                         )
                     )
 
@@ -154,6 +154,10 @@ def sast(
         "",  # Default value of comamand
         help=f"Type of Snyk Code projects to apply tags to: {sasttypes}",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     addprojecttype: bool = typer.Option(
         False,
         "--addprojecttype",  # Default value of comamand
@@ -162,7 +166,7 @@ def sast(
 ):
     type = ["sast"] if sastType is None or sastType == "" else [sastType]
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     typer.secho(
         f"\nAdding the Code tag to {type} projects in Snyk for easy filtering via the UI",
@@ -174,6 +178,7 @@ def sast(
         type,
         tag="Code",
         key="Product",
+        tenant=tenant,
         addprojecttype=addprojecttype,
     )
 
@@ -207,6 +212,10 @@ def iac(
         "",  # Default value of comamand
         help=f"Type of Snyk IaC projects to apply tags to: {iactypes}",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     addprojecttype: bool = typer.Option(
         False,
         "--addprojecttype",  # Default value of comamand
@@ -226,7 +235,7 @@ def iac(
         else [iacType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     typer.secho(
         f"\nAdding the IaC tag to {iacType} projects in Snyk for easy filtering via the UI",
@@ -238,6 +247,7 @@ def iac(
         type,
         tag="IaC",
         key="Product",
+        tenant=tenant,
         addprojecttype=addprojecttype,
     )
 
@@ -268,6 +278,10 @@ def sca(
         ...,  # Default value of comamand
         help="Snyk API token with org admin access",
         envvar=["SNYK_TOKEN"],
+    ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
     ),
     addprojecttype: bool = typer.Option(
         False,
@@ -305,7 +319,7 @@ def sca(
         else [scaType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     typer.secho(
         f"\nAdding the OpenSource tag to {scaType} projects in Snyk for easy filtering via the UI",
@@ -317,6 +331,7 @@ def sca(
         type,
         tag="OpenSource",
         key="Product",
+        tenant=tenant,
         addprojecttype=addprojecttype,
     )
 
@@ -348,6 +363,10 @@ def container(
         "",  # Default value of comamand
         help=f"Type of Snyk Container projects to apply tags to (default:all): {containertypes}",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     addprojecttype: bool = typer.Option(
         False,
         "--addprojecttype",  # Default value of comamand
@@ -360,7 +379,7 @@ def container(
         else [containerType]
     )
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     typer.secho(
         f"\nAdding the Container tag to {containerType} projects in Snyk for easy filtering via the UI",
@@ -372,6 +391,7 @@ def container(
         type,
         tag="Container",
         key="Product",
+        tenant=tenant,
         addprojecttype=addprojecttype,
     )
 
@@ -404,6 +424,10 @@ def custom(
     tagValue: str = typer.Option(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     addprojecttype: bool = typer.Option(
         False,
         "--addprojecttype",  # Default value of comamand
@@ -418,10 +442,10 @@ def custom(
     type = []
     type.append(projectType)
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     apply_tags_to_projects(
-        snyktkn, orgs, type, tagValue, tagKey, addprojecttype=addprojecttype
+        snyktkn, orgs, type, tagValue, tagKey,tenant=tenant, addprojecttype=addprojecttype
     )
 
 
@@ -454,6 +478,10 @@ def alltargets(
         "--name-ignorecase",  # Default value of comamand
         help=f"name case-sensitive, use --name-ignorecase to perform case-insensitive matching.",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     tagKey: str = typer.Option(
         ..., help="Tag key: identifier of the tag"  # Default value of comamand
     ),
@@ -467,8 +495,8 @@ def alltargets(
     )
 
     orgs = (
-        get_org_ids(snyktkn, group_id) if org_id is None or org_id == "" else [org_id]
+        get_org_ids(snyktkn, group_id, tenant) if org_id is None or org_id == "" else [org_id]
     )
     apply_tags_to_projects_by_name(
-        snyktkn, orgs, contains_name, name_ignorecase, tagValue, tagKey
+        snyktkn, orgs, contains_name, name_ignorecase, tagValue, tagKey, tenant=tenant,
     )

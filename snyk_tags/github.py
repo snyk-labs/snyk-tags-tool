@@ -19,10 +19,10 @@ app = typer.Typer()
 
 
 # Reach to the API and generate tokens
-def create_client(token: str) -> httpx.Client:
-    return httpx.Client(
-        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
-    )
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = f"https://api.{tenant}.snyk.io/v1" if tenant in ["eu", "au"] else "https://api.snyk.io/v1"
+    headers = {"Authorization": f"token {token}"}
+    return httpx.Client(base_url=base_url, headers=headers)
 
 
 # Apply tags to a specific project
@@ -45,11 +45,11 @@ def apply_tag_to_project(
 
     if req.status_code == 200:
         logging.info(f"Successfully added {tag_data} tags to Project: {project_name}.")
-    if req.status_code == 422:
+    elif req.status_code == 422:
         logging.warning(
             f"Tag {key}:{tag} is already applied for Project: {project_name}."
         )
-    if req.status_code == 404:
+    elif req.status_code == 404:
         logging.error(
             f"Project not found, likely a READ-ONLY project. Project: {project_name}. Error message: {req.json()}."
         )
@@ -58,18 +58,19 @@ def apply_tag_to_project(
 
 # GitHub Tagging Loop
 def apply_github_owner_to_repo(
-    snyktoken: str, org_ids: list, name: str, githubtoken: str
+    snyktoken: str, org_ids: list, name: str, githubtoken: str, tenant: str
 ) -> None:
     g = Github(githubtoken)
-    with create_client(token=snyktoken) as client:
+    with create_client(token=snyktoken, tenant=tenant) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=snyktoken)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=snyktoken,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
-            for project in projects:
-                if project.name.startswith(name + "(") or project.name.startswith(
+            for project in projects['data']:
+                if project['attributes']['name'].startswith(name + "(") or project['attributes']['name'].startswith(
                     name + ":"
                 ):
                     repo = g.get_repo(name)
@@ -92,10 +93,10 @@ def apply_github_owner_to_repo(
                                             apply_tag_to_project(
                                                 client=client,
                                                 org_id=org_id,
-                                                project_id=project.id,
+                                                project_id=project['id'],
                                                 tag=owner,
                                                 key="Owner",
-                                                project_name=project.name,
+                                                project_name=project['attributes']['name'],
                                             )
                                 else:
                                     print("Invalid CODEOWNERS file")
@@ -110,18 +111,19 @@ def apply_github_owner_to_repo(
 
 
 def apply_github_topics_to_repo(
-    snyktoken: str, org_ids: list, name: str, githubtoken: str
+    snyktoken: str, org_ids: list, name: str, githubtoken: str, tenant: str
 ) -> None:
     g = Github(githubtoken)
-    with create_client(token=snyktoken) as client:
+    with create_client(token=snyktoken, tenant=tenant) as client:
         for org_id in org_ids:
-            client_v3 = SnykClient(token=snyktoken)
-            projects = client_v3.organizations.get(org_id).projects.all()
+            base_url = f"https://api.{tenant}.snyk.io/rest" if tenant in ["eu", "au"] else "https://api.snyk.io/rest"
+            client_v3 = SnykClient(token=snyktoken,url=base_url, version="2023-08-31~experimental")
+            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
 
             badname = 0
             rightname = 0
-            for project in projects:
-                if project.name.startswith(name + "(") or project.name.startswith(
+            for project in projects['data']:
+                if project['attributes']['name'].startswith(name + "(") or project['attributes']['name'].startswith(
                     name + ":"
                 ):
                     repo = g.get_repo(name)
@@ -135,10 +137,10 @@ def apply_github_topics_to_repo(
                             apply_tag_to_project(
                                 client=client,
                                 org_id=org_id,
-                                project_id=project.id,
+                                project_id=project['id'],
                                 tag=topic,
                                 key="GitHubTopic",
-                                project_name=project.name,
+                                project_name=project['attributes']['name'],
                             )
                     rightname = 1
                 else:
@@ -176,13 +178,17 @@ def owners(
         help="GitHub Personal Access Token with access to the repository",
         envvar=["GITHUB_TOKEN"],
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(
         f"\nAdding the Owner tag to projects within {target} for easy filtering via the UI",
         bold=True,
         fg=typer.colors.MAGENTA,
     )
-    apply_github_owner_to_repo(snyktkn, [org_id], target, githubtkn)
+    apply_github_owner_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant)
 
 
 # GitHub Topics Tagging
@@ -209,10 +215,14 @@ def topics(
         help="GitHub Personal Access Token with access to the repository",
         envvar=["GITHUB_TOKEN"],
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(
         f"\nAdding the GitHubTopic tag to projects within {target} for easy filtering via the UI",
         bold=True,
         fg=typer.colors.MAGENTA,
     )
-    apply_github_topics_to_repo(snyktkn, [org_id], target, githubtkn)
+    apply_github_topics_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant)

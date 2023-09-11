@@ -146,6 +146,10 @@ def tag(
         default=FormatType.log,
         help="Output format, one of: log, csv, json",
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     if format == "csv":
         fmtr = CsvFormatter()
@@ -157,7 +161,19 @@ def tag(
     with open(rules, "r") as f:
         rules_doc = parse_rules(f)
         (match_fn, context) = project_matcher(rules_doc)
-        client = Api(snyktkn)
+        client = Api(
+            snyktkn,
+            v1_url=(
+                f"https://api.{tenant}.snyk.io/v1"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/v1"
+            ),
+            rest_url=(
+                f"https://api.{tenant}.snyk.io/rest"
+                if tenant in ["eu", "au"]
+                else "https://api.snyk.io/rest"
+            ),
+        )
         for project in client.org_projects(org_id):
             # Extract and transform project and target data from API response
             # for rule input. Rules operate over project attributes, extended

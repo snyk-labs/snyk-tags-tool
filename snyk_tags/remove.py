@@ -10,9 +10,14 @@ app = typer.Typer()
 
 # Remove tags from a specific project
 def remove_tag_from_project(
-    token: str, org_id: str, project_id: str, tag: str, key: str, project_name: str
+    token: str, org_id: str, project_id: str, tag: str, key: str, project_name: str, tenant: str,
 ) -> tuple:
-    client = SnykClient(token=token)
+    base_url = (
+        f"https://api.{tenant}.snyk.io/rest"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/rest"
+    )
+    client = SnykClient(token=token, url=base_url)
     try:
         client.organizations.get(org_id).projects.get(project_id).tags.delete(key, tag)
         print(f"Removing tag {key}:{tag} from {project_name}")
@@ -29,7 +34,7 @@ def remove_tag_from_project(
 
 # Remove tag loop with pysnyk
 def remove_tags_from_projects(
-    token: str, org_id: list, name: str, tag: str, key: str
+    token: str, org_id: list, name: str, tag: str, key: str, tenant: str,
 ) -> None:
     client = SnykClient(token=token)
     projects = client.organizations.get(org_id).projects.all()
@@ -43,6 +48,7 @@ def remove_tags_from_projects(
                 tag=tag,
                 key=key,
                 project_name=project.name,
+                tenant=tenant,
             )
         else:
             isname = 1
@@ -53,7 +59,7 @@ def remove_tags_from_projects(
 
 
 def remove_tags_from_projects_by_name(
-    token: str, org_id: str, name: str, ignorecase: bool, tag: str, key: str
+    token: str, org_id: str, name: str, ignorecase: bool, tag: str, key: str, tenant: str,
 ) -> None:
     exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
@@ -68,26 +74,32 @@ def remove_tags_from_projects_by_name(
                 tag=tag,
                 key=key,
                 project_name=project.name,
+                tenant=tenant,
             )
 
 
 # Reach to the API and generate tokens
-def create_client(token: str) -> httpx.Client:
+def create_client(token: str, tenant: str) -> httpx.Client:
+    base_url = (
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     return httpx.Client(
-        base_url="https://snyk.io/api/v1", headers={"Authorization": f"token {token}"}
+        base_url=base_url, headers={"Authorization": f"token {token}"}
     )
 
 
 # Apply tags to a specific project
 def remove_tag_from_group(
-    token: str, group_id: str, force: bool, tag: str, key: str
+    token: str, group_id: str, force: bool, tag: str, key: str, tenant: str,
 ) -> tuple:
     if force is True:
         tag_data = {"key": key, "value": tag, "force": force}
     else:
         tag_data = {"key": key, "value": tag}
 
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         req = client.post(f"group/{group_id}/tags/delete", data=tag_data, timeout=None)
         group = client.get(f"group/{group_id}/orgs").json()
         group_name = group["name"]
@@ -134,11 +146,15 @@ def tag_from_target(
     tagValue: str = typer.Option(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(
         f"\nRemoving {tagKey}:{tagValue} from projects within {target}", bold=True
     )
-    remove_tags_from_projects(snyktkn, org_id, target, tagValue, tagKey)
+    remove_tags_from_projects(snyktkn, org_id, target, tagValue, tagKey, tenant)
 
 
 @app.command(
@@ -170,12 +186,16 @@ def tag_from_alltargets(
     tagValue: str = typer.Option(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(
         f"\nRemoving {tagKey}:{tagValue} from projects within {org_id}", bold=True
     )
     remove_tags_from_projects_by_name(
-        snyktkn, org_id, contains_name, name_ignorecase, tagValue, tagKey
+        snyktkn, org_id, contains_name, name_ignorecase, tagValue, tagKey, tenant
     )
 
 
@@ -202,6 +222,10 @@ def tag_from_group(
     tagValue: str = typer.Option(
         ..., help="Tag value: value of the tag"  # Default value of comamand
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)
-    remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey)
+    remove_tag_from_group(snyktkn, group_id, force, tagValue, tagKey, tenant)

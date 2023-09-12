@@ -86,8 +86,8 @@ def apply_tags_to_projects(
             for project in projects["data"]:
                 if (
                     project["attributes"]["name"] == name
-                    or project["attributes"]["name"](name + "(")
-                    or project["attributes"]["name"](name + ":")
+                    or project["attributes"]["name"].startswith(name + "(")
+                    or project["attributes"]["name"].startswith(name + ":")
                 ):
                     apply_tag_to_project(
                         client=client,

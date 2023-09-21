@@ -20,13 +20,19 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 # Remove tags from a specific project
 def remove_tag_from_project(
-    token: str, org_id: str, project_id: str, tag: str, key: str, project_name: str, tenant: str
+    token: str,
+    org_id: str,
+    project_id: str,
+    tag: str,
+    key: str,
+    project_name: str,
+    tenant: str,
 ) -> tuple:
     base_url = (
-                f"https://api.{tenant}.snyk.io/v1"
-                if tenant in ["eu", "au"]
-                else "https://api.snyk.io/v1"
-            )
+        f"https://api.{tenant}.snyk.io/v1"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/v1"
+    )
     client = SnykClient(token=token, url=base_url)
     try:
         client.organizations.get(org_id).projects.get(project_id).tags.delete(key, tag)
@@ -47,10 +53,10 @@ def remove_tags_from_projects(
     token: str, org_id: list, name: str, tag: str, key: str, tenant: str
 ) -> None:
     base_url = (
-                f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
-                else "https://api.snyk.io/rest"
-            )
+        f"https://api.{tenant}.snyk.io/rest"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/rest"
+    )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
     params = {"limit": 100}
     projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
@@ -65,7 +71,7 @@ def remove_tags_from_projects(
                 tag=tag,
                 key=key,
                 project_name=project["attributes"]["name"],
-                tenant=tenant
+                tenant=tenant,
             )
         else:
             isname = 1
@@ -76,15 +82,21 @@ def remove_tags_from_projects(
 
 
 def remove_tags_from_projects_by_name(
-    token: str, org_id: str, name: str, ignorecase: bool, tag: str, key: str, tenant: str
+    token: str,
+    org_id: str,
+    name: str,
+    ignorecase: bool,
+    tag: str,
+    key: str,
+    tenant: str,
 ) -> None:
     exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     base_url = (
-                f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
-                else "https://api.snyk.io/rest"
-            )
+        f"https://api.{tenant}.snyk.io/rest"
+        if tenant in ["eu", "au"]
+        else "https://api.snyk.io/rest"
+    )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
     params = {"limit": 100}
     projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
@@ -98,7 +110,7 @@ def remove_tags_from_projects_by_name(
                 tag=tag,
                 key=key,
                 project_name=project["attributes"]["name"],
-                tenant=tenant
+                tenant=tenant,
             )
 
 

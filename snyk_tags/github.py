@@ -78,7 +78,9 @@ def apply_github_owner_to_repo(
                 token=snyktoken, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             badname = 0
             rightname = 0
@@ -140,7 +142,9 @@ def apply_github_topics_to_repo(
                 token=snyktoken, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             badname = 0
             rightname = 0

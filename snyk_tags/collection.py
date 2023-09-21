@@ -82,7 +82,9 @@ def apply_tags_to_projects(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             badname = 0
             rightname = 0

@@ -42,20 +42,19 @@ def apply_attributes_to_project(
     lifecycle: list,
     project_name: str,
 ) -> tuple:
+    if criticality.count("") == 1:
+        criticality.remove("")
 
-    if (criticality.count('') == 1):
-        criticality.remove('')
+    if environment.count("") == 1:
+        environment.remove("")
 
-    if (environment.count('') == 1):
-        environment.remove('')
-
-    if (lifecycle.count('') == 1):
-        lifecycle.remove('')
+    if lifecycle.count("") == 1:
+        lifecycle.remove("")
 
     attribute_data = {
         "criticality": criticality,
         "environment": environment,
-        "lifecycle": lifecycle
+        "lifecycle": lifecycle,
     }
 
     req = client.post(
@@ -109,7 +108,9 @@ def apply_attributes_to_projects(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             badname = 0
             rightname = 0

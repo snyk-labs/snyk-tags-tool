@@ -97,7 +97,9 @@ def apply_tags_to_projects(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             for project in projects:
                 if project["attributes"]["type"] in types:
@@ -146,7 +148,9 @@ def apply_tags_to_projects_by_name(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
             params = {"limit": 100}
-            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             for project in projects:
                 if p.search(project["attributes"]["name"]):

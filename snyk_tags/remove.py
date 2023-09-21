@@ -52,6 +52,7 @@ def remove_tags_from_projects(
                 project_id=project["id"],
                 tag=tag,
                 key=key,
+                tenant=tenant,
                 project_name=project["attributes"]["name"],
             )
         else:
@@ -83,6 +84,7 @@ def remove_tags_from_projects_by_name(
                 tag=tag,
                 key=key,
                 project_name=project["attributes"]["name"],
+                tenant=tenant,
             )
 
 

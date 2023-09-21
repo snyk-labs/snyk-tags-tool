@@ -17,6 +17,8 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 app = typer.Typer()
 
 
@@ -94,9 +96,10 @@ def apply_tags_to_projects(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
 
-            for project in projects["data"]:
+            for project in projects:
                 if project["attributes"]["type"] in types:
                     logging.debug(
                         apply_tag_to_project(
@@ -132,7 +135,7 @@ def apply_tags_to_projects_by_name(
 ) -> None:
     exp = name.replace("\\", "\\\\") + "+"
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
-    with create_client(token=token) as client:
+    with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
             base_url = (
                 f"https://api.{tenant}.snyk.io/rest"
@@ -142,9 +145,10 @@ def apply_tags_to_projects_by_name(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
 
-            for project in projects["data"]:
+            for project in projects:
                 if p.search(project["attributes"]["name"]):
                     logging.debug(
                         apply_tag_to_project(

@@ -15,6 +15,8 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 app = typer.Typer()
 
 
@@ -75,11 +77,12 @@ def apply_github_owner_to_repo(
             client_v3 = SnykClient(
                 token=snyktoken, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
 
             badname = 0
             rightname = 0
-            for project in projects["data"]:
+            for project in projects:
                 if project["attributes"]["name"].startswith(name + "(") or project[
                     "attributes"
                 ]["name"].startswith(name + ":"):
@@ -136,11 +139,12 @@ def apply_github_topics_to_repo(
             client_v3 = SnykClient(
                 token=snyktoken, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
 
             badname = 0
             rightname = 0
-            for project in projects["data"]:
+            for project in projects:
                 if project["attributes"]["name"].startswith(name + "(") or project[
                     "attributes"
                 ]["name"].startswith(name + ":"):

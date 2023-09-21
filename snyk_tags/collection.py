@@ -15,6 +15,8 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 app = typer.Typer()
 app.add_typer(
     github.app,
@@ -79,11 +81,12 @@ def apply_tags_to_projects(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
 
             badname = 0
             rightname = 0
-            for project in projects["data"]:
+            for project in projects:
                 if (
                     project["attributes"]["name"] == name
                     or project["attributes"]["name"].startswith(name + "(")

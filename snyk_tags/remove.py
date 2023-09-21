@@ -1,11 +1,21 @@
 #! /usr/bin/env python3
-import typer
-import httpx
+import logging
 import re
+
+import httpx
+import typer
 from rich import print
 from snyk import SnykClient
 
 app = typer.Typer()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    datefmt="[%X]",
+)
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 # Remove tags from a specific project
@@ -42,9 +52,11 @@ def remove_tags_from_projects(
                 else "https://api.snyk.io/rest"
             )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
-    projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+    params = {"limit": 100}
+    projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+
     isname = 0
-    for project in projects["data"]:
+    for project in projects:
         if project["attributes"]["name"].startswith(name):
             remove_tag_from_project(
                 token=token,
@@ -53,6 +65,7 @@ def remove_tags_from_projects(
                 tag=tag,
                 key=key,
                 project_name=project["attributes"]["name"],
+                tenant=tenant
             )
         else:
             isname = 1
@@ -73,8 +86,10 @@ def remove_tags_from_projects_by_name(
                 else "https://api.snyk.io/rest"
             )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
-    projects = client_v3.get(f"/orgs/{org_id}/projects").json()
-    for project in projects["data"]:
+    params = {"limit": 100}
+    projects = client_v3.get_rest_pages(f"/orgs/{org_id}/projects", params=params)
+
+    for project in projects:
         if p.search(project["attributes"]["name"]):
             remove_tag_from_project(
                 token=token,
@@ -83,6 +98,7 @@ def remove_tags_from_projects_by_name(
                 tag=tag,
                 key=key,
                 project_name=project["attributes"]["name"],
+                tenant=tenant
             )
 
 

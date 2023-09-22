@@ -16,6 +16,8 @@ logging.basicConfig(
     datefmt="[%X]",
 )
 
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 app = typer.Typer()
 
 
@@ -26,7 +28,7 @@ def create_client(token: str, tenant: str) -> httpx.Client:
         if tenant in ["eu", "au"]
         else "https://api.snyk.io/v1"
     )
-    headers = {"Authorization": f"token {token}"}
+    headers = {"Authorization": f"token {token}", "Content-Type": "application/json"}
     return httpx.Client(base_url=base_url, headers=headers)
 
 
@@ -40,28 +42,24 @@ def apply_attributes_to_project(
     lifecycle: list,
     project_name: str,
 ) -> tuple:
-    if criticality != [""] and environment != [""] and lifecycle != [""]:
-        attribute_data = {
-            "criticality": criticality,
-            "environment": environment,
-            "lifecycle": lifecycle,
-        }
-    elif criticality != [""] and environment == [""] and lifecycle == [""]:
-        attribute_data = {"criticality": criticality}
-    elif criticality == [""] and environment != [""] and lifecycle == [""]:
-        attribute_data = {"environment": environment}
-    elif criticality == [""] and environment == [""] and lifecycle != [""]:
-        attribute_data = {"lifecycle": lifecycle}
-    elif criticality != [""] and environment != [""] and lifecycle == [""]:
-        attribute_data = {"criticality": criticality, "environment": environment}
-    elif criticality == [""] and environment != [""] and lifecycle != [""]:
-        attribute_data = {"environment": environment, "lifecycle": lifecycle}
-    elif criticality != [""] and environment == [""] and lifecycle != [""]:
-        attribute_data = {"criticality": criticality, "lifecycle": lifecycle}
+    if criticality.count("") == 1:
+        criticality.remove("")
+
+    if environment.count("") == 1:
+        environment.remove("")
+
+    if lifecycle.count("") == 1:
+        lifecycle.remove("")
+
+    attribute_data = {
+        "criticality": criticality,
+        "environment": environment,
+        "lifecycle": lifecycle,
+    }
 
     req = client.post(
         f"org/{org_id}/project/{project_id}/attributes",
-        data=json.dumps(attribute_data),
+        data=json.dumps(attribute_data).replace("'", '"'),
         timeout=None,
     )
 
@@ -109,12 +107,15 @@ def apply_attributes_to_projects(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            projects = client_v3.get(f"/orgs/{org_id}/projects").json()
+            params = {"limit": 100}
+            projects = client_v3.get_rest_pages(
+                f"/orgs/{org_id}/projects", params=params
+            )
 
             badname = 0
             rightname = 0
 
-            for project in projects["data"]:
+            for project in projects:
                 if project["attributes"]["name"].startswith(name):
                     apply_attributes_to_project(
                         client=client,

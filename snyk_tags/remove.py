@@ -72,7 +72,6 @@ def remove_tags_from_projects(
                 key=key,
                 tenant=tenant,
                 project_name=project["attributes"]["name"],
-                tenant=tenant,
             )
         else:
             isname = 1

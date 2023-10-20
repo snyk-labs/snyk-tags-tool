@@ -1,6 +1,7 @@
 site_name: Snyk Tags Tool
 nav:
   - Home: README.md
+  - Components: components.md
 
 theme:
   name: readthedocs

@@ -72,6 +72,71 @@ rules:
     )
 
 
+def test_component_tag_match_target_dry_run(tmpdir, httpx_mock):
+    rules_file = tmpdir.join("rules.yaml")
+    rules_file.write(
+        """
+version: 1
+rules:
+  - name: test
+    projects:
+      - target:
+          url:
+            regex: '.*/(?P<org>\S+)/(?P<proj>\S+)$'
+    component: '{org}-{proj}-component'
+"""
+    )
+    httpx_mock.add_response(
+        method="GET",
+        url=re.compile("^.*/orgs/some-org/projects[?].*"),
+        json={
+            "data": [
+                {
+                    "id": "some-project",
+                    "attributes": {
+                        "name": "test",
+                    },
+                    "relationships": {
+                        "target": {
+                            "data": {
+                                "attributes": {
+                                    "display_name": "some-org/java-goof",
+                                    "url": "https://github.com/some-org/java-goof",
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        },
+    )
+    httpx_mock.add_response(
+        method="POST", url=re.compile("^.*/org/some-org/project/some-project/tags$")
+    )
+    httpx_mock.add_response(
+        status_code=400
+    )  # catch-all response, otherwise backoff retry will block testing
+
+    result = runner.invoke(
+        app,
+        [
+            "component",
+            "tag",
+            "--org-id",
+            "some-org",
+            "--snyktkn",
+            "some-token",
+            "--dry-run",
+            str(rules_file),
+        ],
+    )
+    assert result.exit_code == 0
+    assert (
+        """would add tag "component:some-org-java-goof-component" in project id="some-project" name="test\""""
+        in result.stdout
+    )
+
+
 def test_component_tag_match_added(tmpdir, httpx_mock):
     rules_file = tmpdir.join("rules.yaml")
     rules_file.write(

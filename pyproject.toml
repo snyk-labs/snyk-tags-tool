@@ -4,7 +4,7 @@ version = "2.2.2"
 description = "CLI tool designed to manage tags and attributes at scale"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"
-readme = "README.md"
+readme = "docs/README.md"
 repository = "https://github.com/snyk-labs/snyk-tags-tool"
 keywords =["snyk"]
 

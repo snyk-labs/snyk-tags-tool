@@ -194,7 +194,7 @@ def tag(
             # Clear context as this dict is (re)used in-place with each
             # execution of the project matcher rules.
             context.clear()
-            component = match_fn(project.get("attributes", {}))
+            component = match_fn(project_obj)
             if not component:
                 # Rule did not match
                 continue

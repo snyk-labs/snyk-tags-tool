@@ -57,10 +57,9 @@ class Api:
     @backoff.on_exception(backoff.expo, httpx.HTTPError, **backoff_params)
     def org_projects(self, org_id: str):
         with self.v3_client() as c:
-            next = f"/orgs/{org_id}/projects"
-            params = {"expand": "target", "limit": 100}
+            next = f"/orgs/{org_id}/projects?expand=target&limit=100"
             while next:
-                resp = c.get(next, params=params)
+                resp = c.get(next)
                 resp.raise_for_status()
                 assert resp.status_code == 200
                 body = resp.json()

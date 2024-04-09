@@ -26,6 +26,7 @@ jsonschema = "^4"
 certifi = "2023.7.22"
 pygments = "2.15.0"
 requests = "2.31.0"
+cryptography = "42.0.4"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^6.0.0"

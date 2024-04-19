@@ -63,7 +63,7 @@ Once you run ```snyk-tags```, go into the UI, naviagate to the projects page and
 
 ### **Requirements**
 
-Requires Python version above 3.6
+Requires Python version above 3.8
 
 ### **Installation**
 
@@ -121,12 +121,14 @@ snyk-tags target attributes  --target=snyk-labs/python-goof --org-id=abc --snytk
 ```
 
 I want mark with the repo owners all projects of the repo ```snyk-labs/nodejs-goof``` so I can filter by owner e.g.```Owner:EricFernandezSnyk```
+(to use a private GitHub instance, use `--gh-base-url=<your instance's API baseurl>`. Example: `--gh-base-url=https://gh.local/api/v3`)
 
 ``` bash
 snyk-tags target github owners --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --githubtkn=abc
 ```
 
 I want add my GitHub Topics to all projects of the repo ```snyk-labs/nodejs-goof``` so I can filter by topics e.g.```GitHubTopic:python3```
+(to use a private GitHub instance, use `--gh-base-url=<your instance's API baseurl>`. Example: `--gh-base-url=https://gh.local/api/v3`)
 
 ``` bash
 snyk-tags target github topics --target=snyk-labs/nodejs-goof --org-id=abc --snyktkn=abc --githubtkn=abc

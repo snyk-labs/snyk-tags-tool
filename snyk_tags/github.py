@@ -271,4 +271,5 @@ def topics(
         bold=True,
         fg=typer.colors.MAGENTA,
     )
+    gh_base_url = validate_gh_url(gh_base_url)
     apply_github_topics_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url)

@@ -5,6 +5,7 @@ import re
 
 import httpx
 import typer
+import validators
 from github import Github
 from github import Auth
 from rich import print
@@ -62,6 +63,13 @@ def apply_tag_to_project(
         )
     return req.status_code, req.json()
 
+def validate_gh_url(
+        url: str
+        ) -> str:
+        validated_url = "invalid_gh_base_url"
+        if validators.url(url):
+            validated_url = url
+        return validated_url
 
 # GitHub Tagging Loop
 def apply_github_owner_to_repo(
@@ -221,6 +229,7 @@ def owners(
         bold=True,
         fg=typer.colors.MAGENTA,
     )
+    gh_base_url = validate_gh_url(gh_base_url)
     apply_github_owner_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url)
 
 

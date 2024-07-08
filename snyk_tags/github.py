@@ -63,19 +63,24 @@ def apply_tag_to_project(
         )
     return req.status_code, req.json()
 
-def validate_gh_url(
-        url: str
-        ) -> str:
-        validated_url = "invalid_gh_base_url"
-        if validators.url(url):
-            validated_url = url
-        return validated_url
+
+def validate_gh_url(url: str) -> str:
+    validated_url = "invalid_gh_base_url"
+    if validators.url(url):
+        validated_url = url
+    return validated_url
+
 
 # GitHub Tagging Loop
 def apply_github_owner_to_repo(
-    snyktoken: str, org_ids: list, name: str, githubtoken: str, tenant: str, gh_base_url: str
+    snyktoken: str,
+    org_ids: list,
+    name: str,
+    githubtoken: str,
+    tenant: str,
+    gh_base_url: str,
 ) -> None:
-    ghauth= Auth.Token(githubtoken)
+    ghauth = Auth.Token(githubtoken)
     g = Github(base_url=gh_base_url, auth=ghauth)
     with create_client(token=snyktoken, tenant=tenant) as client:
         for org_id in org_ids:
@@ -138,9 +143,14 @@ def apply_github_owner_to_repo(
 
 
 def apply_github_topics_to_repo(
-    snyktoken: str, org_ids: list, name: str, githubtoken: str, tenant: str, gh_base_url: str
+    snyktoken: str,
+    org_ids: list,
+    name: str,
+    githubtoken: str,
+    tenant: str,
+    gh_base_url: str,
 ) -> None:
-    ghauth= Auth.Token(githubtoken)
+    ghauth = Auth.Token(githubtoken)
     g = Github(base_url=gh_base_url, auth=ghauth)
     with create_client(token=snyktoken, tenant=tenant) as client:
         for org_id in org_ids:
@@ -221,8 +231,8 @@ def owners(
     ),
     gh_base_url: str = typer.Option(
         "https://api.github.com",
-        help=f"Base URL of Github instance (e.g. https://ghe.internal/api/v3). Defaults to https://api.github.com (Github.com)"
-    )
+        help=f"Base URL of Github instance (e.g. https://ghe.internal/api/v3). Defaults to https://api.github.com (Github.com)",
+    ),
 ):
     typer.secho(
         f"\nAdding the Owner tag to projects within {target} for easy filtering via the UI",
@@ -230,7 +240,9 @@ def owners(
         fg=typer.colors.MAGENTA,
     )
     gh_base_url = validate_gh_url(gh_base_url)
-    apply_github_owner_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url)
+    apply_github_owner_to_repo(
+        snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url
+    )
 
 
 # GitHub Topics Tagging
@@ -263,8 +275,8 @@ def topics(
     ),
     gh_base_url: str = typer.Option(
         "https://api.github.com",
-        help=f"Base URL of Github instance (e.g. https://ghe.internal/api/v3). Defaults to https://api.github.com (Github.com)"
-    )
+        help=f"Base URL of Github instance (e.g. https://ghe.internal/api/v3). Defaults to https://api.github.com (Github.com)",
+    ),
 ):
     typer.secho(
         f"\nAdding the GitHubTopic tag to projects within {target} for easy filtering via the UI",
@@ -272,4 +284,6 @@ def topics(
         fg=typer.colors.MAGENTA,
     )
     gh_base_url = validate_gh_url(gh_base_url)
-    apply_github_topics_to_repo(snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url)
+    apply_github_topics_to_repo(
+        snyktkn, [org_id], target, githubtkn, tenant=tenant, gh_base_url=gh_base_url
+    )

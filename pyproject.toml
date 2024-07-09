@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "snyk-tags"
-version = "2.2.4"
+version = "2.3.0"
 description = "CLI tool designed to manage tags and attributes at scale"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"
@@ -12,7 +12,7 @@ keywords =["snyk"]
 snyk-tags = "snyk_tags.tags:app"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.8,<4.0"
 typer = ">=0.5.0"
 httpx = "^0.24.0"
 colorama = "^0.4.5"
@@ -26,6 +26,7 @@ jsonschema = "^4"
 certifi = "2023.7.22"
 pygments = "2.15.0"
 requests = "2.31.0"
+validators = "^0.28.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^6.0.0"

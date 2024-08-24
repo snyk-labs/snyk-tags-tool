@@ -47,7 +47,11 @@ def target_tag(
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    filters = { attr: val for attr, val in row.items() if attr in ["target_reference", "origins", "types"]}
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
                         bold=True,
@@ -63,7 +67,11 @@ def target_tag(
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
-                    filters = { attr: val for attr, val in row.items() if attr in ["target_reference", "origins", "types"]}
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
                         bold=True,

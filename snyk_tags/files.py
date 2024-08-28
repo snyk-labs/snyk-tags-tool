@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 import typer
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import csv
 from snyk_tags import collection, attribute, remove
 from rich import print
@@ -37,6 +37,7 @@ def target_tag(
     ),
 ):
     for path in file:
+        filters = {}
         if path.is_file():
             openfile = open(path)
             if ".csv" in openfile.name:
@@ -46,12 +47,17 @@ def target_tag(
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
                         bold=True,
                     )
                     collection.apply_tags_to_projects(
-                        snyktkn, [org_id], target, value, key, tenant
+                        snyktkn, [org_id], target, value, key, tenant, filters
                     )
                 openfile.close()
             elif ".json" in openfile.name:
@@ -61,12 +67,17 @@ def target_tag(
                     target = row.get("target")
                     key = row.get("key")
                     value = row.get("value")
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the tag key {key} and tag value {value} to projects within {target} for easy filtering via the UI",
                         bold=True,
                     )
                     collection.apply_tags_to_projects(
-                        snyktkn, [org_id], target, value, key, tenant
+                        snyktkn, [org_id], target, value, key, tenant, filters
                     )
                 openfile.close()
             else:

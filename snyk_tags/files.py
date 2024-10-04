@@ -105,6 +105,7 @@ def target_attributes(
     ),
 ):
     for path in file:
+        filters = {}
         if path.is_file():
             openfile = open(path)
             if ".csv" in openfile.name:
@@ -115,6 +116,11 @@ def target_attributes(
                     criticality = row.get("criticality")
                     environment = row.get("environment")
                     lifecycle = row.get("lifecycle")
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI",
                         bold=True,
@@ -128,6 +134,7 @@ def target_attributes(
                         [environment],
                         [lifecycle],
                         tenant,
+                        filters,
                     )
                 openfile.close()
             elif ".json" in openfile.name:
@@ -138,6 +145,11 @@ def target_attributes(
                     criticality = row.get("criticality")
                     environment = row.get("environment")
                     lifecycle = row.get("lifecycle")
+                    filters = {
+                        attr: val
+                        for attr, val in row.items()
+                        if attr in ["target_reference", "origins", "types"]
+                    }
                     typer.secho(
                         f"\nAdding the attributes {criticality}, {environment} and {lifecycle} to projects within {target} for easy filtering via the UI",
                         bold=True,
@@ -151,6 +163,7 @@ def target_attributes(
                         [environment],
                         [lifecycle],
                         tenant,
+                        filters,
                     )
                 openfile.close()
             else:

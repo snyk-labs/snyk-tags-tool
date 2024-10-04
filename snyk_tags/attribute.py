@@ -7,6 +7,7 @@ import httpx
 import typer
 from rich import print
 from snyk import SnykClient
+from typing import Dict
 
 from snyk_tags import __app_name__, __version__
 
@@ -96,6 +97,7 @@ def apply_attributes_to_projects(
     environment: list,
     lifecycle: list,
     tenant: str,
+    filters: Dict[str, any],
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
@@ -107,7 +109,7 @@ def apply_attributes_to_projects(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            params = {"limit": 100}
+            params = {"limit": 100, **filters}
             projects = client_v3.get_rest_pages(
                 f"/orgs/{org_id}/projects", params=params
             )

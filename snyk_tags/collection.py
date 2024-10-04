@@ -88,7 +88,7 @@ def apply_tags_to_projects(
             client_v3 = SnykClient(
                 token=token, url=base_url, version="2023-08-31~experimental"
             )
-            params = {"limit": 100, "names_start_with": name, **filters}
+            params = {"limit": 100, **filters}
             projects = client_v3.get_rest_pages(
                 f"/orgs/{org_id}/projects", params=params
             )

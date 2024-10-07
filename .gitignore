@@ -8,6 +8,6 @@ dist
 .DS_Store
 **/.DS_Store
 tests/test_codeowners.py
-test.csv
+test*.csv
 TODO
 rules.yml

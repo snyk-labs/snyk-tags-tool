@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "snyk-tags"
-version = "2.4.0"
+version = "2.5.0"
 description = "CLI tool designed to manage tags and attributes at scale"
 authors = ["EricFernandezSnyk <eric.fernandez@snyk.io>"]
 license = "MIT"

@@ -1,7 +1,13 @@
 # snyk_tags/__init__.py
 
 __app_name__ = "snyk_tags"
-__version__ = "2.5.0"
+try:
+    from importlib.metadata import version
+    __version__ = version(__app_name__)
+
+except ImportError:
+    __version__ = "development"
+
 
 from logging import ERROR
 from sre_constants import SUCCESS

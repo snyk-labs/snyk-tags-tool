@@ -30,7 +30,7 @@ def remove_tag_from_project(
 ) -> tuple:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     client = SnykClient(token=token, url=base_url)
@@ -54,7 +54,7 @@ def remove_tags_from_projects(
 ) -> None:
     base_url = (
         f"https://api.{tenant}.snyk.io/rest"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/rest"
     )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
@@ -94,7 +94,7 @@ def remove_tags_from_projects_by_name(
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     base_url = (
         f"https://api.{tenant}.snyk.io/rest"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/rest"
     )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
@@ -118,7 +118,7 @@ def remove_tags_from_projects_by_name(
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}
@@ -183,7 +183,7 @@ def tag_from_target(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     typer.secho(
@@ -223,7 +223,7 @@ def tag_from_alltargets(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     typer.secho(
@@ -259,7 +259,7 @@ def tag_from_group(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     typer.secho(f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}", bold=True)

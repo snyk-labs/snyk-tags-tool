@@ -71,7 +71,7 @@ def attributes():
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}
@@ -115,7 +115,7 @@ def tags(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
     json: bool = typer.Option(
         False,

@@ -26,7 +26,7 @@ app = typer.Typer()
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}
@@ -86,7 +86,7 @@ def apply_github_owner_to_repo(
         for org_id in org_ids:
             base_url = (
                 f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/rest"
             )
             client_v3 = SnykClient(
@@ -156,7 +156,7 @@ def apply_github_topics_to_repo(
         for org_id in org_ids:
             base_url = (
                 f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/rest"
             )
             client_v3 = SnykClient(
@@ -227,7 +227,7 @@ def owners(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
     gh_base_url: str = typer.Option(
         "https://api.github.com",
@@ -271,7 +271,7 @@ def topics(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
     gh_base_url: str = typer.Option(
         "https://api.github.com",

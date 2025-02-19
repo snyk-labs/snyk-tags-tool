@@ -3,6 +3,7 @@
 __app_name__ = "snyk_tags"
 try:
     from importlib.metadata import version
+
     __version__ = version(__app_name__)
 
 except ImportError:

@@ -33,7 +33,7 @@ def target_tag(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     for path in file:
@@ -101,7 +101,7 @@ def target_attributes(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     for path in file:
@@ -192,7 +192,7 @@ def remove_tag_from_group(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
     force: bool = typer.Option(
         False,
@@ -252,7 +252,7 @@ def remove_tag_from_target(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     for path in file:

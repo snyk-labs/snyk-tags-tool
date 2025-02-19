@@ -148,7 +148,7 @@ def tag(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     if format == "csv":

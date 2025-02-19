@@ -165,12 +165,12 @@ def tag(
             snyktkn,
             v1_url=(
                 f"https://api.{tenant}.snyk.io/v1"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/v1"
             ),
             rest_url=(
                 f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/rest"
             ),
         )

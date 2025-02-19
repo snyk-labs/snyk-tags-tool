@@ -71,7 +71,7 @@ def attributes():
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}

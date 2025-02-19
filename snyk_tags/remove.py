@@ -30,7 +30,7 @@ def remove_tag_from_project(
 ) -> tuple:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     client = SnykClient(token=token, url=base_url)
@@ -54,7 +54,7 @@ def remove_tags_from_projects(
 ) -> None:
     base_url = (
         f"https://api.{tenant}.snyk.io/rest"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/rest"
     )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
@@ -94,7 +94,7 @@ def remove_tags_from_projects_by_name(
     p = re.compile(exp, re.IGNORECASE) if ignorecase else re.compile(exp)
     base_url = (
         f"https://api.{tenant}.snyk.io/rest"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/rest"
     )
     client_v3 = SnykClient(token=token, url=base_url, version="2023-08-31~experimental")
@@ -118,7 +118,7 @@ def remove_tags_from_projects_by_name(
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}

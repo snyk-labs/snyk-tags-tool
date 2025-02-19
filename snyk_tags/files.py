@@ -190,6 +190,10 @@ def remove_tag_from_group(
     snyktkn: str = typer.Option(
         ..., help="Snyk API token with Group admin access", envvar=["SNYK_TOKEN"]
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
     force: bool = typer.Option(
         False,
         "--force",
@@ -208,9 +212,10 @@ def remove_tag_from_group(
                         f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}",
                         bold=True,
                     )
-                    remove.remove_tag_from_group(
-                        snyktkn, group_id, force, tagValue, tagKey
-                    )
+                    if tagKey and tagValue:
+                        remove.remove_tag_from_group(
+                            snyktkn, group_id, force, tagValue, tagKey, tenant
+                        )
                 openfile.close()
             elif ".json" in openfile.name:
                 jsonreader = json.load(openfile)
@@ -221,9 +226,10 @@ def remove_tag_from_group(
                         f"\nRemoving {tagKey}:{tagValue} from Group ID: {group_id}",
                         bold=True,
                     )
-                    remove.remove_tag_from_group(
-                        snyktkn, group_id, force, tagValue, tagKey
-                    )
+                    if tagKey and tagValue:
+                        remove.remove_tag_from_group(
+                            snyktkn, group_id, force, tagValue, tagKey, tenant
+                        )
                 openfile.close()
             else:
                 print(
@@ -244,6 +250,10 @@ def remove_tag_from_target(
     snyktkn: str = typer.Option(
         ..., help="Snyk API token with org admin access", envvar=["SNYK_TOKEN"]
     ),
+    tenant: str = typer.Option(
+        "",  # Default value of comamand
+        help=f"Defaults to US tenant, add 'eu' or 'au' to use EU or AU tenant, use --tenant to change tenant.",
+    ),
 ):
     for path in file:
         if path.is_file():
@@ -260,7 +270,7 @@ def remove_tag_from_target(
                         bold=True,
                     )
                     remove.remove_tags_from_projects(
-                        snyktkn, org_id, target, value, key
+                        snyktkn, org_id, target, value, key, tenant
                     )
                 openfile.close()
             elif ".json" in openfile.name:
@@ -275,7 +285,7 @@ def remove_tag_from_target(
                         bold=True,
                     )
                     remove.remove_tags_from_projects(
-                        snyktkn, org_id, target, value, key
+                        snyktkn, org_id, target, value, key, tenant
                     )
                 openfile.close()
             else:

@@ -26,7 +26,7 @@ app = typer.Typer()
 def create_client(token: str, tenant: str) -> httpx.Client:
     base_url = (
         f"https://api.{tenant}.snyk.io/v1"
-        if tenant in ["eu", "au"]
+        if tenant in ["eu", "au", "us"]
         else "https://api.snyk.io/v1"
     )
     headers = {"Authorization": f"token {token}"}
@@ -86,7 +86,7 @@ def apply_github_owner_to_repo(
         for org_id in org_ids:
             base_url = (
                 f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/rest"
             )
             client_v3 = SnykClient(
@@ -156,7 +156,7 @@ def apply_github_topics_to_repo(
         for org_id in org_ids:
             base_url = (
                 f"https://api.{tenant}.snyk.io/rest"
-                if tenant in ["eu", "au"]
+                if tenant in ["eu", "au", "us"]
                 else "https://api.snyk.io/rest"
             )
             client_v3 = SnykClient(

@@ -163,7 +163,7 @@ def tag(
         bold=True,
         fg=typer.colors.MAGENTA,
     )
-    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey, tenant=tenant)
+    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey, tenant=tenant, filters={})
 
 
 # Collection command to apply the attributes to the collection
@@ -210,4 +210,5 @@ def attributes(
         [environment],
         [lifecycle],
         tenant=tenant,
+        filters={},
     )

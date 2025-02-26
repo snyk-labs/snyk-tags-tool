@@ -7,7 +7,7 @@ import httpx
 import typer
 from rich import print
 from snyk import SnykClient
-from typing import Dict
+from typing import Dict, Any
 
 from snyk_tags import __app_name__, __version__
 
@@ -96,8 +96,8 @@ def apply_attributes_to_projects(
     criticality: list,
     environment: list,
     lifecycle: list,
-    tenant: str,
-    filters: Dict[str, any],
+    tenant: str = "",
+    filters: Dict[str, Any] = {},
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:

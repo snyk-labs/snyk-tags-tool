@@ -6,7 +6,7 @@ import httpx
 import typer
 from rich import print
 from snyk import SnykClient
-from typing import Dict
+from typing import Dict, Any
 
 from snyk_tags import __app_name__, __version__, attribute, github
 
@@ -75,8 +75,8 @@ def apply_tags_to_projects(
     name: str,
     tag: str,
     key: str,
-    tenant: str,
-    filters: Dict[str, any],
+    tenant: str = "",
+    filters: Dict[str, Any] = {},
 ) -> None:
     with create_client(token=token, tenant=tenant) as client:
         for org_id in org_ids:
@@ -149,7 +149,7 @@ def tag(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
+        help="Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
     tagKey: str = typer.Option(
         ..., help="Tag key: identifier of the tag"  # Default value of comamand
@@ -163,7 +163,7 @@ def tag(
         bold=True,
         fg=typer.colors.MAGENTA,
     )
-    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey, tenant=tenant)
+    apply_tags_to_projects(snyktkn, [org_id], target, tagValue, tagKey, tenant)
 
 
 # Collection command to apply the attributes to the collection
@@ -194,7 +194,7 @@ def attributes(
     ),
     tenant: str = typer.Option(
         "",  # Default value of comamand
-        help=f"Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
+        help="Defaults to US tenant (app.snyk.io), add 'eu', 'au' or 'us' to use alternative regional tenant. Use --tenant to change tenant.",
     ),
 ):
     typer.secho(
@@ -209,5 +209,5 @@ def attributes(
         [criticality],
         [environment],
         [lifecycle],
-        tenant=tenant,
+        tenant,
     )
